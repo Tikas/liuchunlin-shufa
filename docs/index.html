@@ -325,14 +325,6 @@
     </div>
 
     <button type="button" class="submit-btn" id="renderBtn" onclick="submitRender()">立即挥毫生成书法作品</button>
-
-    <details class="api-config">
-      <summary>Ubuntu 渲染主机接口设置（管理员）</summary>
-      <div style="margin-top:8px;">
-        <input type="text" id="apiUrlInput" placeholder="https://您的Ubuntu服务器域名或Tunnel地址" onchange="saveApiUrl()" />
-        <p style="margin-top:4px;">提示：字库安全锁存在私有 Ubuntu 主机内存中，前端绝不加载任何 TTF 字库文件。</p>
-      </div>
-    </details>
   </div>
 
   <!-- 右侧：作品展示与长按保存裂变区 -->
@@ -592,7 +584,6 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('apiUrlInput').value = getApiBase();
     updateSmartBanner();
     refreshQuota();
   });
