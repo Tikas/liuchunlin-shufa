@@ -288,6 +288,7 @@
     <div class="preset-bar">
       <button type="button" class="preset-btn active" onclick="loadPreset('chunjiang_trad')">《春江花月夜》繁·乌丝栏</button>
       <button type="button" class="preset-btn" onclick="loadPreset('chunjiang_simp')">《春江花月夜》简·素笺</button>
+      <button type="button" class="preset-btn" onclick="loadPreset('shanju_trad')">《山居秋暝》五言·乌丝栏</button>
       <button type="button" class="preset-btn" onclick="loadPreset('xinjing_trad')">《心经》繁·乌丝栏</button>
       <button type="button" class="preset-btn" onclick="loadPreset('lanting_simp')">《兰亭集序》简·素笺</button>
     </div>
@@ -348,7 +349,35 @@
 
     <div class="action-bar">
       <span class="share-tip">💡 手机微信长按上方图片可「保存到相册」或直接「识别右下角朱砂印章二维码」</span>
-      <a id="downloadLink" class="download-btn" href="gallery/chunjiang_trad.jpg" download="刘春霖小楷书法作品.png">下载高清书法大图 (PNG/JPG)</a>
+      <a id="downloadLink" class="download-btn" href="gallery/chunjiang_trad.jpg" download="刘春霖小楷书法作品.jpg">下载高清书法大图 (JPG)</a>
+    </div>
+  </div>
+</div>
+
+<!-- 底部：经典作品馆与真迹复刻对比展示 -->
+<div style="max-width: 1120px; margin: 12px auto 32px; padding: 0 16px;">
+  <div class="panel">
+    <div class="panel-title">
+      <span>刘春霖 AI 小楷书房 · 经典名篇与真迹对比鉴赏馆（点击图片可放大查看高清原图）</span>
+      <span class="quota-pill">对 AI 生成书法作品有兴趣可联系微信 2480555 加群</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-top: 8px;">
+      <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
+        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">1. 《长恨歌》宣纸真迹 vs AI 小楷复刻对比</div>
+        <a href="gallery/showcase_changhenge.jpg" target="_blank"><img src="gallery/showcase_changhenge.jpg" alt="长恨歌真迹对比" style="width: 100%; border-radius: 4px; display: block;" /></a>
+      </div>
+      <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
+        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">2. 《春江花月夜》繁简双绝 · 零训练盲测展示</div>
+        <a href="gallery/showcase_chunjiang_blindtest.jpg" target="_blank"><img src="gallery/showcase_chunjiang_blindtest.jpg" alt="春江花月夜展示" style="width: 100%; border-radius: 4px; display: block;" /></a>
+      </div>
+      <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
+        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">3. 《心经》乌丝栏 &《兰亭集序》无格素笺双范式</div>
+        <a href="gallery/showcase_copybook_sim.jpg" target="_blank"><img src="gallery/showcase_copybook_sim.jpg" alt="心经与兰亭集序展示" style="width: 100%; border-radius: 4px; display: block;" /></a>
+      </div>
+      <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
+        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">4. 微信朋友圈裂变装裱设计（朱砂印章二维码）</div>
+        <a href="gallery/showcase_qr_seal_demo.jpg" target="_blank"><img src="gallery/showcase_qr_seal_demo.jpg" alt="朱砂二维码印章设计" style="width: 100%; border-radius: 4px; display: block;" /></a>
+      </div>
     </div>
   </div>
 </div>
@@ -369,6 +398,12 @@
       style: 'clean',
       gallery: 'gallery/chunjiang_simp.jpg',
       text: `《春江花月夜》\n【唐】张若虚\n春江潮水连海平，海上明月共潮生。\n滟滟随波千万里，何处春江无月明。\n江流宛转绕芳甸，月照花林皆似霰。\n空里流霜不觉飞，汀上白沙看不见。\n江天一色无纤尘，皎皎空中孤月轮。\n江畔何人初见月，江月何年初照人。\n人生代代无穷已，江月年年望相似。\n不知江月待何人，但见长江送流水。\n白云一片去悠悠，青枫浦上不胜愁。`
+    },
+    shanju_trad: {
+      edition: 'trad',
+      style: 'zhalan',
+      gallery: 'gallery/shanju_trad.jpg',
+      text: `《山居秋暝》\n【唐】王維\n空山新雨後，天氣晚來秋。\n明月松間照，清泉石上流。\n竹喧歸浣女，蓮動下漁舟。\n隨意春芳歇，王孫自可留。`
     },
     xinjing_trad: {
       edition: 'trad',
