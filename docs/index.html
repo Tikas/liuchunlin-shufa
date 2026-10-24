@@ -497,18 +497,24 @@
     document.getElementById('downloadLink').href = p.gallery;
   }
 
+  const DEFAULT_API_BASE = 'https://ai.top915.top/shufa-api';
+
   function getApiBase() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('api')) {
       localStorage.setItem('liuchunlin_api_base', params.get('api'));
       return params.get('api').replace(/\/+$/, '');
     }
-    return (localStorage.getItem('liuchunlin_api_base') || '').replace(/\/+$/, '');
+    return (localStorage.getItem('liuchunlin_api_base') || DEFAULT_API_BASE).replace(/\/+$/, '');
   }
 
   function saveApiUrl() {
     const v = document.getElementById('apiUrlInput').value.trim().replace(/\/+$/, '');
-    localStorage.setItem('liuchunlin_api_base', v);
+    if (v) {
+      localStorage.setItem('liuchunlin_api_base', v);
+    } else {
+      localStorage.removeItem('liuchunlin_api_base');
+    }
     refreshQuota();
   }
 

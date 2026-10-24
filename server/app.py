@@ -39,9 +39,10 @@ from pydantic import BaseModel, Field
 
 # Locate v003 engine & private font directory
 HERE = Path(__file__).resolve().parent
-PROJECT_ROOT = HERE.parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = HERE if (HERE / "generate_liuchunlin_copybook.py").exists() else HERE.parent.parent
+for _p in (str(HERE), str(PROJECT_ROOT)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from generate_liuchunlin_copybook import render_copybook_page
 
@@ -80,16 +81,16 @@ _init_quota_db()
 
 
 def get_client_ip(request: Request) -> str:
-    """Extract real client IP (prioritizing Cloudflare `CF-Connecting-IP`)."""
+    """Extract real client IP (trusting local Nginx `X-Real-IP` first to prevent header spoofing)."""
+    xri = request.headers.get("X-Real-IP")
+    if xri:
+        return xri.strip()
     cf_ip = request.headers.get("CF-Connecting-IP")
     if cf_ip:
         return cf_ip.strip()
     xff = request.headers.get("X-Forwarded-For")
     if xff:
         return xff.split(",")[0].strip()
-    xri = request.headers.get("X-Real-IP")
-    if xri:
-        return xri.strip()
     return request.client.host if request.client else "unknown"
 
 
@@ -292,10 +293,10 @@ def attach_museum_qr_footer(page_img: Image.Image, edition: str = "simp", site_u
     f_m2 = ImageFont.truetype(str(ttf_p), 24)
     if edition == "trad":
         line1 = "劉春霖小楷書房 · 在線生成您的專屬詩詞書法"
-        line2 = "微信長按右側朱砂印章 → 輸入任意詩詞文字，一秒生成宣紙字帖作品"
+        line2 = "微信長按右側朱砂印章 · 輸入任意詩詞文字，一秒生成宣紙字帖作品"
     else:
         line1 = "刘春霖小楷书房 · 在线生成您的专属诗词书法"
-        line2 = "微信长按右侧朱砂印章 → 输入任意诗词文字，一秒生成宣纸字帖作品"
+        line2 = "微信长按右侧朱砂印章 · 输入任意诗词文字，一秒生成宣纸字帖作品"
 
     dr.text((128, H + 34), line1, fill=(55, 45, 38, 255), font=f_m1)
     dr.text((128, H + 80), line2, fill=(148, 38, 30, 255), font=f_m2)
