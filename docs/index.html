@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>刘春霖小楷书房 · 在线定制您的专属诗词书法册页</title>
+  <style>
+    :root {
+      --bg-paper: #efe8d8;
+      --card-paper: #f7f3e8;
+      --ink-dark: #1f1b18;
+      --ink-muted: #655a4e;
+      --cinnabar: #a8221a;
+      --cinnabar-light: #f9ecea;
+      --gold-border: #c8b698;
+      --silk-footer: #d6cdbc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-paper);
+      background-image: radial-gradient(circle at 50% 20%, #f5efe2 0%, #e5dcc8 100%);
+      color: var(--ink-dark);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Serif SC", "Songti SC", serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+    header {
+      background: linear-gradient(180deg, #231f1c 0%, #2e2925 100%);
+      color: #f4eee1;
+      padding: 24px 20px 20px;
+      text-align: center;
+      border-bottom: 3px solid var(--cinnabar);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    }
+    .seal-badge {
+      display: inline-block;
+      background: var(--cinnabar);
+      color: #f8f3e6;
+      font-size: 13px;
+      padding: 2px 9px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.45);
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+    header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      margin-bottom: 6px;
+    }
+    header p {
+      font-size: 13.5px;
+      color: #cbbda6;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 22px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--card-paper);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(45, 35, 22, 0.08);
+    }
+    .panel-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ink-dark);
+      border-left: 4px solid var(--cinnabar);
+      padding-left: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .quota-pill {
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+      border: 1px solid rgba(168, 34, 26, 0.3);
+      padding: 2px 9px;
+      border-radius: 12px;
+    }
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .preset-btn {
+      background: #ece3d0;
+      border: 1px solid #c4b293;
+      color: #3a322a;
+      font-size: 12.5px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--cinnabar);
+      color: #fff;
+      border-color: var(--cinnabar);
+    }
+    label.field-label {
+      display: block;
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 12px;
+      border: 1px solid #c5b496;
+      border-radius: 6px;
+      background: #fcfaf4;
+      color: var(--ink-dark);
+      font-size: 15px;
+      line-height: 1.65;
+      resize: vertical;
+      font-family: inherit;
+    }
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: var(--cinnabar);
+    }
+    .smart-banner {
+      margin-top: 10px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background: #f2ead9;
+      border: 1px dashed #bfa882;
+      border-radius: 6px;
+      font-size: 12.5px;
+      color: #4a3f33;
+    }
+    .smart-banner strong { color: var(--cinnabar); }
+    .row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #c5b496;
+      border-radius: 5px;
+      background: #fcfaf4;
+      font-size: 14px;
+      color: var(--ink-dark);
+    }
+    .radio-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .radio-card {
+      border: 1px solid #c5b496;
+      background: #fcfaf4;
+      border-radius: 5px;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 13.5px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .radio-card.selected {
+      background: var(--cinnabar-light);
+      border-color: var(--cinnabar);
+      color: var(--cinnabar);
+      font-weight: 600;
+    }
+    .submit-btn {
+      width: 100%;
+      background: var(--cinnabar);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 13px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(168, 34, 26, 0.3);
+      transition: opacity 0.15s;
+    }
+    .submit-btn:hover { opacity: 0.92; }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .preview-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .artwork-frame {
+      width: 100%;
+      background: #24211e;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.45);
+      text-align: center;
+    }
+    .artwork-frame img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 3px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+      display: block;
+      margin: 0 auto;
+    }
+    .action-bar {
+      margin-top: 14px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .download-btn {
+      background: #2b2622;
+      color: #f5efe2;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 5px;
+      font-size: 14px;
+      border: 1px solid #8c785c;
+      cursor: pointer;
+    }
+    .share-tip {
+      font-size: 13px;
+      color: var(--cinnabar);
+      font-weight: 500;
+    }
+    .api-config {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid #e0d5c0;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+    .api-config summary { cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="seal-badge">状元小楷 · 宣纸真迹神韵</div>
+  <h1>刘春霖小楷书房</h1>
+  <p>输入任意诗词或座右铭，智能识别题名落款，一秒生成故宫装裱级小楷书法册页</p>
+</header>
+
+<div class="container">
+  <!-- 左侧：输入与智能章法控制面板 -->
+  <div class="panel">
+    <div class="panel-title">
+      <span>题写诗词正文</span>
+      <span class="quota-pill" id="quotaBadge">每日限免：2 幅 / IP</span>
+    </div>
+
+    <label class="field-label">经典名篇一键体验：</label>
+    <div class="preset-bar">
+      <button type="button" class="preset-btn active" onclick="loadPreset('chunjiang_trad')">《春江花月夜》繁·乌丝栏</button>
+      <button type="button" class="preset-btn" onclick="loadPreset('chunjiang_simp')">《春江花月夜》简·素笺</button>
+      <button type="button" class="preset-btn" onclick="loadPreset('xinjing_trad')">《心经》繁·乌丝栏</button>
+      <button type="button" class="preset-btn" onclick="loadPreset('lanting_simp')">《兰亭集序》简·素笺</button>
+    </div>
+
+    <label class="field-label" for="poemInput">粘贴或输入诗词/文章（支持第一行直接带《题名》和作者）：</label>
+    <textarea id="poemInput" oninput="onTextChange()">《春江花月夜》
+【唐】張若虛
+春江潮水連海平，海上明月共潮生。
+灩灩隨波千萬里，何處春江無月明。
+江流宛轉繞芳甸，月照花林皆似霰。
+空裏流霜不覺飛，汀上白沙看不見。
+江天一色無纖塵，皎皎空中孤月輪。
+江畔何人初見月，江月何年初照人。
+人生代代無窮已，江月年年望相似。
+不知江月待何人，但見長江送流水。
+白雲一片去悠悠，青楓浦上不勝愁。</textarea>
+
+    <div class="smart-banner" id="smartBanner">
+      <strong>智能章法识别：</strong>已识别题名「<span id="detTitle">春江花月夜</span>」、作者「<span id="detAuthor">張若虛</span>」<br/>
+      <span id="detLayout">体裁：七言古近体诗 → 自动排入 10列×14行 正方形册页（右侧第1列独立低起题名+作者落款钤印，正文每列恰好一联14字）</span>
+    </div>
+
+    <div class="row-2col">
+      <div>
+        <label class="field-label" for="titleInput">题名（自动识别或手填）：</label>
+        <input type="text" id="titleInput" placeholder="如：春江花月夜（可留空）" oninput="updateSmartBanner()" />
+      </div>
+      <div>
+        <label class="field-label" for="authorInput">作者/落款：</label>
+        <input type="text" id="authorInput" placeholder="如：张若虚 / 春霖敬书" oninput="updateSmartBanner()" />
+      </div>
+    </div>
+
+    <label class="field-label">字体选择：</label>
+    <div class="radio-group">
+      <div class="radio-card selected" id="ed_trad" onclick="setEdition('trad')">繁体馆阁体（正统旧字形）</div>
+      <div class="radio-card" id="ed_simp" onclick="setEdition('simp')">简体馆阁体（现代通用）</div>
+    </div>
+
+    <label class="field-label">宣纸册页范式：</label>
+    <div class="radio-group">
+      <div class="radio-card selected" id="st_zhalan" onclick="setStyle('zhalan')">《心经》式 · 乌丝栏带格</div>
+      <div class="radio-card" id="st_clean" onclick="setStyle('clean')">《兰亭》式 · 仿古无格素笺</div>
+    </div>
+
+    <button type="button" class="submit-btn" id="renderBtn" onclick="submitRender()">立即挥毫生成书法作品</button>
+
+    <details class="api-config">
+      <summary>Ubuntu 渲染主机接口设置（管理员）</summary>
+      <div style="margin-top:8px;">
+        <input type="text" id="apiUrlInput" placeholder="https://您的Ubuntu服务器域名或Tunnel地址" onchange="saveApiUrl()" />
+        <p style="margin-top:4px;">提示：字库安全锁存在私有 Ubuntu 主机内存中，前端绝不加载任何 TTF 字库文件。</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- 右侧：作品展示与长按保存裂变区 -->
+  <div class="panel preview-wrap">
+    <div class="panel-title" style="width:100%;">
+      <span id="previewTitle">作品预览（含底部故宫宋锦装裱签条与微信长按二维码印）</span>
+    </div>
+
+    <div class="artwork-frame">
+      <img id="resultImg" src="gallery/chunjiang_trad.jpg" alt="刘春霖小楷书法作品" />
+    </div>
+
+    <div class="action-bar">
+      <span class="share-tip">💡 手机微信长按上方图片可「保存到相册」或直接「识别右下角朱砂印章二维码」</span>
+      <a id="downloadLink" class="download-btn" href="gallery/chunjiang_trad.jpg" download="刘春霖小楷书法作品.png">下载高清书法大图 (PNG/JPG)</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentEdition = 'trad';
+  let currentStyle = 'zhalan';
+
+  const PRESETS = {
+    chunjiang_trad: {
+      edition: 'trad',
+      style: 'zhalan',
+      gallery: 'gallery/chunjiang_trad.jpg',
+      text: `《春江花月夜》\n【唐】張若虛\n春江潮水連海平，海上明月共潮生。\n灩灩隨波千萬里，何處春江無月明。\n江流宛轉繞芳甸，月照花林皆似霰。\n空裏流霜不覺飛，汀上白沙看不見。\n江天一色無纖塵，皎皎空中孤月輪。\n江畔何人初見月，江月何年初照人。\n人生代代無窮已，江月年年望相似。\n不知江月待何人，但見長江送流水。\n白雲一片去悠悠，青楓浦上不勝愁。`
+    },
+    chunjiang_simp: {
+      edition: 'simp',
+      style: 'clean',
+      gallery: 'gallery/chunjiang_simp.jpg',
+      text: `《春江花月夜》\n【唐】张若虚\n春江潮水连海平，海上明月共潮生。\n滟滟随波千万里，何处春江无月明。\n江流宛转绕芳甸，月照花林皆似霰。\n空里流霜不觉飞，汀上白沙看不见。\n江天一色无纤尘，皎皎空中孤月轮。\n江畔何人初见月，江月何年初照人。\n人生代代无穷已，江月年年望相似。\n不知江月待何人，但见长江送流水。\n白云一片去悠悠，青枫浦上不胜愁。`
+    },
+    xinjing_trad: {
+      edition: 'trad',
+      style: 'zhalan',
+      gallery: 'gallery/xinjing_trad.jpg',
+      text: `般若波羅蜜多心經\n觀自在菩薩，行深般若波羅蜜多時，照見五蘊皆空，度一切苦厄。舍利子，色不異空，空不異色，色即是空，空即是色，受想行識，亦復如是。舍利子，是諸法空相，不生不滅，不垢不淨，不增不減。是故空中無色，無受想行識，無眼耳鼻舌身意，無色聲香味觸法，無眼界，乃至無意識界，無無明，亦無無明盡，乃至無老死，亦無老死盡。無苦集滅道，無智亦無得，以無所得故。`
+    },
+    lanting_simp: {
+      edition: 'simp',
+      style: 'clean',
+      gallery: 'gallery/lanting_simp.jpg',
+      text: `永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。群贤毕至，少长咸集。此地有崇山峻岭，茂林修竹，又有清流激湍，映带左右，引以为流觞曲水，列坐其次。虽无丝竹管弦之盛，一觞一咏，亦足以畅叙幽情。是日也，天朗气清，惠风和畅。仰观宇宙之大，俯察品类之盛，所以游目骋怀，足以极视听之娱，信可乐也。`
+    }
+  };
+
+  function cleanDynasty(s) {
+    return s.replace(/^[\[【（(][^\]】）)]{1,4}[\]】）)]\s*/, '')
+            .replace(/^(?:作者|撰人|书者)[:：]\s*/, '')
+            .replace(/^(?:唐|宋|元|明|清|汉|魏|晋|南北朝|隋|近代|现代)[·・\s]+/, '')
+            .trim();
+  }
+
+  function smartParseInput(rawText, expTitle, expAuthor) {
+    let title = (expTitle || '').trim().replace(/^[《「『]|[》」』]$/g, '');
+    let author = (expAuthor || '').trim();
+    let lines = rawText.trim().split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    if (!lines.length) return { title, author, body: '', rows: 14 };
+
+    if (!title && lines.length >= 2) {
+      const l0 = lines[0];
+      const mBook = l0.match(/^[《「『]([^》」』]{1,12})[》」』]\s*(.*)$/);
+      if (mBook) {
+        title = mBook[1].trim();
+        const rem = cleanDynasty(mBook[2]);
+        if (rem && rem.length <= 5) {
+          author = author || rem;
+          lines = lines.slice(1);
+        } else {
+          lines = lines.slice(1);
+          if (lines.length >= 2) {
+            const candA = cleanDynasty(lines[0]);
+            if (candA.length >= 1 && candA.length <= 5 && !/[，。！？；：,.!?]/.test(lines[0])) {
+              author = author || candA;
+              lines = lines.slice(1);
+            }
+          }
+        }
+      } else {
+        const parts = l0.split(/\s+/);
+        if (parts.length === 2 && parts[0].length <= 8 && cleanDynasty(parts[1]).length <= 5 && !/[，。！？；：,.!?]/.test(l0)) {
+          title = parts[0];
+          author = author || cleanDynasty(parts[1]);
+          lines = lines.slice(1);
+        } else if (l0.length <= 8 && !/[，。！？；：,.!?]/.test(l0) && lines[1].length > l0.length && !l0.includes('心經') && !l0.includes('心经')) {
+          title = l0;
+          lines = lines.slice(1);
+          if (lines.length >= 2) {
+            const candA = cleanDynasty(lines[0]);
+            if (candA.length >= 1 && candA.length <= 5 && !/[，。！？；：,.!?]/.test(lines[0])) {
+              author = author || candA;
+              lines = lines.slice(1);
+            }
+          }
+        }
+      }
+    }
+    const body = lines.join('');
+    const clauses = body.split(/[，。！？；：、,.!?;:\n]+/).map(s => s.replace(/\s+/g, '')).filter(Boolean);
+    let rows = title ? 14 : (currentStyle === 'zhalan' ? 15 : 13);
+    let genre = title ? '古近体诗词（首列独立题名落款）' : '散文/经文（顶格连写 + 篇尾落款钤印）';
+    if (clauses.length >= 4) {
+      const lens = clauses.slice(0, 8).map(c => c.length);
+      const c7 = lens.filter(l => l === 7).length;
+      const c5 = lens.filter(l => l === 5).length;
+      if (c7 >= lens.length * 0.75) {
+        rows = 14;
+        genre = '七言古近体诗 → 自动排入 10列×14行 正方形册页（首列独立低起题款，正文每列恰好一联14字）';
+      } else if (c5 >= lens.length * 0.75) {
+        rows = 15;
+        genre = '五言古近体诗 → 自动排入 10列×15行 正方形册页（首列独立低起题款，正文每列恰好三句15字）';
+      }
+    }
+    return { title, author, body, rows, genre };
+  }
+
+  function updateSmartBanner() {
+    const raw = document.getElementById('poemInput').value;
+    const tIn = document.getElementById('titleInput').value;
+    const aIn = document.getElementById('authorInput').value;
+    const info = smartParseInput(raw, tIn, aIn);
+    document.getElementById('detTitle').textContent = info.title || '（无独立题名·顶格起写）';
+    document.getElementById('detAuthor').textContent = info.author || (currentEdition === 'trad' ? '春霖敬書' : '刘春霖书');
+    document.getElementById('detLayout').textContent = info.genre;
+  }
+
+  function onTextChange() {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    updateSmartBanner();
+  }
+
+  function setEdition(ed) {
+    currentEdition = ed;
+    document.getElementById('ed_trad').classList.toggle('selected', ed === 'trad');
+    document.getElementById('ed_simp').classList.toggle('selected', ed === 'simp');
+    updateSmartBanner();
+  }
+
+  function setStyle(st) {
+    currentStyle = st;
+    document.getElementById('st_zhalan').classList.toggle('selected', st === 'zhalan');
+    document.getElementById('st_clean').classList.toggle('selected', st === 'clean');
+    updateSmartBanner();
+  }
+
+  function loadPreset(key) {
+    const p = PRESETS[key];
+    if (!p) return;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('poemInput').value = p.text;
+    document.getElementById('titleInput').value = '';
+    document.getElementById('authorInput').value = '';
+    setEdition(p.edition);
+    setStyle(p.style);
+    const imgEl = document.getElementById('resultImg');
+    imgEl.src = p.gallery;
+    document.getElementById('downloadLink').href = p.gallery;
+  }
+
+  function getApiBase() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('api')) {
+      localStorage.setItem('liuchunlin_api_base', params.get('api'));
+      return params.get('api').replace(/\/+$/, '');
+    }
+    return (localStorage.getItem('liuchunlin_api_base') || '').replace(/\/+$/, '');
+  }
+
+  function saveApiUrl() {
+    const v = document.getElementById('apiUrlInput').value.trim().replace(/\/+$/, '');
+    localStorage.setItem('liuchunlin_api_base', v);
+    refreshQuota();
+  }
+
+  async function refreshQuota() {
+    const apiBase = getApiBase();
+    if (!apiBase) return;
+    try {
+      const r = await fetch(`${apiBase}/api/quota`);
+      if (r.ok) {
+        const d = await r.json();
+        document.getElementById('quotaBadge').textContent = `今日剩余免费：${d.remaining} / ${d.daily_limit} 幅`;
+      }
+    } catch (e) {}
+  }
+
+  async function submitRender() {
+    const apiBase = getApiBase();
+    const raw = document.getElementById('poemInput').value.trim();
+    if (!raw) {
+      alert('请先输入要生成的诗词或文字内容！');
+      return;
+    }
+    if (!apiBase) {
+      alert('当前为 GitHub Pages 静态展示模式（可直接切换上方四大名篇预览并扫码测试）。\n\n如需动态生成新文字，请在页面左下角「Ubuntu 渲染主机接口设置」中填入您的 Ubuntu 服务器 HTTPS 接口地址！');
+      return;
+    }
+    const btn = document.getElementById('renderBtn');
+    btn.disabled = true;
+    btn.textContent = '正在研墨挥毫生成中（约1秒）...';
+    try {
+      const resp = await fetch(`${apiBase}/api/render`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: raw,
+          title: document.getElementById('titleInput').value.trim(),
+          author: document.getElementById('authorInput').value.trim(),
+          edition: currentEdition,
+          style: currentStyle
+        })
+      });
+      if (!resp.ok) {
+        let msg = `生成失败 (${resp.status})`;
+        try {
+          const errJson = await resp.json();
+          if (errJson.detail) msg = errJson.detail;
+        } catch (e) {}
+        alert(msg);
+        return;
+      }
+      const rem = resp.headers.get('X-Quota-Remaining');
+      if (rem !== null) {
+        document.getElementById('quotaBadge').textContent = `今日剩余免费：${rem} / 2 幅`;
+      }
+      const blob = await resp.blob();
+      const objUrl = URL.createObjectURL(blob);
+      document.getElementById('resultImg').src = objUrl;
+      document.getElementById('downloadLink').href = objUrl;
+    } catch (err) {
+      alert('无法连接 Ubuntu 渲染主机，请检查主机服务或 Cloudflare Tunnel 是否已启动。');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '立即挥毫生成书法作品';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('apiUrlInput').value = getApiBase();
+    updateSmartBanner();
+    refreshQuota();
+  });
+</script>
+</body>
+</html>
