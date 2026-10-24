@@ -565,7 +565,10 @@
     const apiBase = getApiBase();
     if (!apiBase) return;
     try {
-      const r = await fetch(`${apiBase}/api/quota`);
+      const params = new URLSearchParams(window.location.search);
+      const ref = encodeURIComponent(document.referrer || '');
+      const src = encodeURIComponent(params.get('src') || '');
+      const r = await fetch(`${apiBase}/api/quota?ref=${ref}&src=${src}`);
       if (r.ok) {
         const d = await r.json();
         const lim = d.hourly_limit || d.daily_limit || 10;

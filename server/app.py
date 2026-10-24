@@ -26,6 +26,7 @@ import re
 import sqlite3
 import sys
 import threading
+import urllib.request
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -75,10 +76,157 @@ def _init_quota_db() -> None:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS ip_geo_cache (
+                ip TEXT PRIMARY KEY,
+                region TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS visitor_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts TEXT NOT NULL,
+                day TEXT NOT NULL,
+                ip TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                device TEXT NOT NULL,
+                referrer TEXT NOT NULL,
+                ua TEXT NOT NULL,
+                region TEXT NOT NULL DEFAULT '解析中...'
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS render_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts TEXT NOT NULL,
+                day TEXT NOT NULL,
+                ip TEXT NOT NULL,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                char_count INTEGER NOT NULL,
+                edition TEXT NOT NULL,
+                style TEXT NOT NULL,
+                region TEXT NOT NULL DEFAULT '解析中...'
+            )
+            """
+        )
         conn.commit()
 
 
 _init_quota_db()
+
+
+def _now_bjt() -> Tuple[str, str]:
+    """Return `(ts_str, day_str)` in Beijing Time (`UTC+8`)."""
+    bjt = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+    return bjt.strftime("%Y-%m-%d %H:%M:%S"), bjt.strftime("%Y-%m-%d")
+
+
+def _classify_channel_and_device(ua: str, ref: str, src: str) -> Tuple[str, str]:
+    ua_l = (ua or "").lower()
+    ref_l = (ref or "").lower()
+    src_l = (src or "").lower()
+
+    is_wx = "micromessenger" in ua_l
+    if "iphone" in ua_l or "ipad" in ua_l:
+        dev = "微信(iPhone)" if is_wx else "iPhone/iPad"
+    elif "android" in ua_l:
+        dev = "微信(Android)" if is_wx else "Android手机"
+    elif "macintosh" in ua_l or "mac os" in ua_l:
+        dev = "微信(Mac版)" if is_wx else "Mac电脑"
+    elif "windows" in ua_l:
+        dev = "微信(Windows版)" if is_wx else "Windows电脑"
+    else:
+        dev = "微信内置浏览器" if is_wx else "其他终端"
+
+    if is_wx or src_l == "qr":
+        channel = "微信长按扫码 / 朋友圈裂变"
+    elif "github.com" in ref_l:
+        channel = "GitHub 项目主页跳转"
+    elif any(k in ref_l for k in ("google.", "baidu.", "bing.", "sogou.", "so.com")):
+        channel = "搜索引擎自然流量"
+    elif ref_l and "dvbs2000.github.io" not in ref_l:
+        channel = f"外部网站引荐 ({ref[:36]})"
+    else:
+        channel = "直接访问 / 书签或系统相机扫码"
+    return channel, dev
+
+
+def _resolve_ip_region_bg(ip: str) -> None:
+    if not ip or ip in ("127.0.0.1", "unknown", "::1"):
+        region = "本地回环"
+    else:
+        with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+            row = conn.execute("SELECT region FROM ip_geo_cache WHERE ip = ?", (ip,)).fetchone()
+            if row and row[0] and row[0] != "解析中...":
+                region = row[0]
+            else:
+                region = ""
+        if not region:
+            try:
+                url = f"http://ip-api.com/json/{ip}?lang=zh-CN&fields=status,country,regionName,city,isp"
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=2.5) as resp:
+                    data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+                if data.get("status") == "success":
+                    parts = [p for p in (data.get("country"), data.get("regionName"), data.get("city")) if p]
+                    isp = data.get("isp", "")
+                    region = " · ".join(parts) + (f" ({isp[:18]})" if isp else "")
+                else:
+                    region = "海外或未知节点"
+            except Exception:
+                region = "未知地区"
+            with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO ip_geo_cache (ip, region) VALUES (?, ?)",
+                    (ip, region),
+                )
+                conn.commit()
+
+    with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+        conn.execute("UPDATE visitor_logs SET region = ? WHERE ip = ? AND region = '解析中...'", (region, ip))
+        conn.execute("UPDATE render_logs SET region = ? WHERE ip = ? AND region = '解析中...'", (region, ip))
+        conn.commit()
+
+
+def record_visitor_event(ip: str, ua: str, ref: str, src: str) -> None:
+    ts, day = _now_bjt()
+    channel, dev = _classify_channel_and_device(ua, ref, src)
+    with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+        cached = conn.execute("SELECT region FROM ip_geo_cache WHERE ip = ?", (ip,)).fetchone()
+        region = cached[0] if cached else "解析中..."
+        conn.execute(
+            """
+            INSERT INTO visitor_logs (ts, day, ip, channel, device, referrer, ua, region)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (ts, day, ip, channel, dev, (ref or "")[:180], (ua or "")[:220], region),
+        )
+        conn.commit()
+    if region == "解析中...":
+        threading.Thread(target=_resolve_ip_region_bg, args=(ip,), daemon=True).start()
+
+
+def record_render_event(ip: str, title: str, author: str, char_count: int, edition: str, style: str) -> None:
+    ts, day = _now_bjt()
+    with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+        cached = conn.execute("SELECT region FROM ip_geo_cache WHERE ip = ?", (ip,)).fetchone()
+        region = cached[0] if cached else "解析中..."
+        conn.execute(
+            """
+            INSERT INTO render_logs (ts, day, ip, title, author, char_count, edition, style, region)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (ts, day, ip, title or "（无题）", author or "（默认）", char_count, edition, style, region),
+        )
+        conn.commit()
+    if region == "解析中...":
+        threading.Thread(target=_resolve_ip_region_bg, args=(ip,), daemon=True).start()
 
 
 def get_client_ip(request: Request) -> str:
@@ -343,14 +491,99 @@ class RenderRequest(BaseModel):
 
 
 @app.get("/api/quota")
-async def get_quota_status(request: Request):
+async def get_quota_status(request: Request, ref: str = "", src: str = "", track: int = 1):
     ip = get_client_ip(request)
+    if track == 1:
+        ua = request.headers.get("User-Agent", "")
+        eff_ref = ref or request.headers.get("Referer", "")
+        record_visitor_event(ip=ip, ua=ua, ref=eff_ref, src=src)
     allowed, rem = check_and_consume_quota(ip, consume=False)
     return {
         "allowed": allowed,
         "remaining": rem,
         "hourly_limit": HOURLY_IP_LIMIT,
         "daily_limit": HOURLY_IP_LIMIT,
+    }
+
+
+@app.get("/api/stats")
+async def get_visitor_stats():
+    _, today = _now_bjt()
+    with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+        today_pv = conn.execute("SELECT COUNT(*) FROM visitor_logs WHERE day = ?", (today,)).fetchone()[0]
+        today_uv = conn.execute("SELECT COUNT(DISTINCT ip) FROM visitor_logs WHERE day = ?", (today,)).fetchone()[0]
+        today_renders = conn.execute("SELECT COUNT(*) FROM render_logs WHERE day = ?", (today,)).fetchone()[0]
+
+        total_pv = conn.execute("SELECT COUNT(*) FROM visitor_logs").fetchone()[0]
+        total_uv = conn.execute("SELECT COUNT(DISTINCT ip) FROM visitor_logs").fetchone()[0]
+        total_renders = conn.execute("SELECT COUNT(*) FROM render_logs").fetchone()[0]
+
+        wx_visits = conn.execute(
+            "SELECT COUNT(*) FROM visitor_logs WHERE channel LIKE '%微信%'"
+        ).fetchone()[0]
+
+        ch_rows = conn.execute(
+            "SELECT channel, COUNT(*) as cnt FROM visitor_logs GROUP BY channel ORDER BY cnt DESC LIMIT 10"
+        ).fetchall()
+        reg_rows = conn.execute(
+            "SELECT region, COUNT(*) as cnt FROM visitor_logs GROUP BY region ORDER BY cnt DESC LIMIT 15"
+        ).fetchall()
+        dev_rows = conn.execute(
+            "SELECT device, COUNT(*) as cnt FROM visitor_logs GROUP BY device ORDER BY cnt DESC LIMIT 10"
+        ).fetchall()
+
+        rec_renders = conn.execute(
+            "SELECT ts, ip, region, title, author, char_count, edition, style FROM render_logs ORDER BY id DESC LIMIT 30"
+        ).fetchall()
+        rec_visitors = conn.execute(
+            "SELECT ts, ip, region, channel, device, referrer FROM visitor_logs ORDER BY id DESC LIMIT 50"
+        ).fetchall()
+
+    denom = max(1, total_pv)
+    return {
+        "summary": {
+            "today_pv": today_pv,
+            "today_uv": today_uv,
+            "today_renders": today_renders,
+            "total_pv": total_pv,
+            "total_uv": total_uv,
+            "total_renders": total_renders,
+            "wechat_visits": wx_visits,
+            "wechat_ratio_pct": round(wx_visits * 100.0 / denom, 1),
+        },
+        "channels": [
+            {"name": r[0], "count": r[1], "pct": round(r[1] * 100.0 / denom, 1)} for r in ch_rows
+        ],
+        "regions": [
+            {"name": r[0], "count": r[1], "pct": round(r[1] * 100.0 / denom, 1)} for r in reg_rows
+        ],
+        "devices": [
+            {"name": r[0], "count": r[1], "pct": round(r[1] * 100.0 / denom, 1)} for r in dev_rows
+        ],
+        "recent_renders": [
+            {
+                "ts": r[0],
+                "ip": r[1],
+                "region": r[2],
+                "title": r[3],
+                "author": r[4],
+                "char_count": r[5],
+                "edition": "繁体" if r[6] == "trad" else "简体",
+                "style": "乌丝栏" if r[7] == "zhalan" else "无格素笺",
+            }
+            for r in rec_renders
+        ],
+        "recent_visitors": [
+            {
+                "ts": r[0],
+                "ip": r[1],
+                "region": r[2],
+                "channel": r[3],
+                "device": r[4],
+                "referrer": r[5] or "（直接打开/扫码）",
+            }
+            for r in rec_visitors
+        ],
     }
 
 
@@ -392,6 +625,15 @@ def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     max_page_chars = (avail_body_cols - 1) * rows_per_col + max(2, rows_per_col - reserved_tail_rows)
     was_truncated = len(clean_body) > max_page_chars
     one_page_body = "".join(clean_body[:max_page_chars])
+
+    record_render_event(
+        ip=ip,
+        title=title,
+        author=author or colophon,
+        char_count=len(one_page_body),
+        edition=edition,
+        style=style,
+    )
 
     with _RENDER_LOCK:
         page_img = render_copybook_page(

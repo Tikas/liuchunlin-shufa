@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>刘春霖 AI 小楷书房 · 访客来源与微信扫码裂变实时分析看板</title>
+  <style>
+    :root {
+      --bg-paper: #efe8d8;
+      --card-paper: #f7f3e8;
+      --ink-dark: #1f1b18;
+      --ink-muted: #655a4e;
+      --cinnabar: #a8221a;
+      --gold-border: #c8b698;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-paper);
+      color: var(--ink-dark);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Serif SC", serif;
+      line-height: 1.5;
+      padding-bottom: 48px;
+    }
+    header {
+      background: #231f1c;
+      color: #f4eee1;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 3px solid var(--cinnabar);
+    }
+    header h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 6px; }
+    header p { font-size: 13px; color: #cbbda6; }
+    .wrap { max-width: 1180px; margin: 20px auto; padding: 0 16px; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: var(--card-paper);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .kpi-val { font-size: 26px; font-weight: 700; color: var(--cinnabar); margin-top: 4px; }
+    .kpi-label { font-size: 12.5px; color: var(--ink-muted); }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    .panel {
+      background: var(--card-paper);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .panel h2 {
+      font-size: 16px;
+      border-bottom: 1px solid #dfd3bd;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td {
+      text-align: left;
+      padding: 8px 6px;
+      border-bottom: 1px dashed #e2d7c3;
+    }
+    th { color: var(--ink-muted); font-weight: 600; }
+    .bar-bg {
+      background: #e5dcc8;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 90px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .bar-fill { background: var(--cinnabar); height: 100%; }
+    .btn-refresh {
+      background: var(--cinnabar);
+      color: #fff;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-size: 11.5px;
+      background: #efe4d2;
+      border: 1px solid #d5c3a6;
+    }
+    .tag-wx { background: #e6f4ea; border-color: #81c995; color: #137333; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>刘春霖 AI 小楷书房 · 访客与裂变统计看板</h1>
+  <p>实时追踪访问人数 (PV/UV)、微信长按二维码裂变占比、外部来源网址、访客地区及实时挥毫记录</p>
+</header>
+
+<div class="wrap">
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">今日访问人次 (PV)</div><div class="kpi-val" id="k_today_pv">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">今日独立访客 (UV)</div><div class="kpi-val" id="k_today_uv">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">今日生成书法作品</div><div class="kpi-val" id="k_today_renders">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">累计总访问 (Total PV)</div><div class="kpi-val" id="k_total_pv">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">累计独立 IP (Total UV)</div><div class="kpi-val" id="k_total_uv">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">累计生成作品总数</div><div class="kpi-val" id="k_total_renders">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">微信扫码/朋友圈占比</div><div class="kpi-val" id="k_wx_pct">-</div></div>
+  </div>
+
+  <div class="grid-3">
+    <div class="panel" style="margin-bottom:0;">
+      <h2><span>1. 访客来源渠道分布</span><button class="btn-refresh" onclick="loadStats()">刷新数据</button></h2>
+      <table>
+        <thead><tr><th>来源渠道</th><th>访问量</th><th>占比</th></tr></thead>
+        <tbody id="tb_channels"></tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-bottom:0;">
+      <h2><span>2. 访客国家 / 省市地区 Top 15</span></h2>
+      <table>
+        <thead><tr><th>地区与运营商</th><th>访问量</th><th>占比</th></tr></thead>
+        <tbody id="tb_regions"></tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-bottom:0;">
+      <h2><span>3. 终端设备与微信环境</span></h2>
+      <table>
+        <thead><tr><th>设备终端</th><th>访问量</th><th>占比</th></tr></thead>
+        <tbody id="tb_devices"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><span>最近 30 幅实时生成的书法作品记录</span><a href="index.html" style="font-size:13px;color:var(--cinnabar);">← 返回书法创作主页</a></h2>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>生成时间 (北京)</th><th>访客地区</th><th>访客 IP</th><th>题名</th><th>作者/落款</th><th>单页字数</th><th>字体与范式</th></tr>
+        </thead>
+        <tbody id="tb_renders"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><span>最近 50 条实时访客来源明细</span></h2>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>访问时间 (北京)</th><th>访客地区</th><th>访客 IP</th><th>识别渠道</th><th>终端设备</th><th>来源引荐页 (Referrer)</th></tr>
+        </thead>
+        <tbody id="tb_visitors"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'https://ai.top915.top/shufa-api';
+
+  function renderDistTable(tbodyId, rows) {
+    const tb = document.getElementById(tbodyId);
+    if (!rows || !rows.length) {
+      tb.innerHTML = '<tr><td colspan="3" style="color:#888;">暂无记录</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.name}</td>
+        <td><strong>${r.count}</strong></td>
+        <td><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, r.pct)}%"></div></div>${r.pct}%</td>
+      </tr>
+    `).join('');
+  }
+
+  async function loadStats() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/stats`);
+      const d = await resp.json();
+      const s = d.summary;
+      document.getElementById('k_today_pv').textContent = s.today_pv;
+      document.getElementById('k_today_uv').textContent = s.today_uv;
+      document.getElementById('k_today_renders').textContent = s.today_renders;
+      document.getElementById('k_total_pv').textContent = s.total_pv;
+      document.getElementById('k_total_uv').textContent = s.total_uv;
+      document.getElementById('k_total_renders').textContent = s.total_renders;
+      document.getElementById('k_wx_pct').textContent = s.wechat_ratio_pct + '%';
+
+      renderDistTable('tb_channels', d.channels);
+      renderDistTable('tb_regions', d.regions);
+      renderDistTable('tb_devices', d.devices);
+
+      const tbR = document.getElementById('tb_renders');
+      tbR.innerHTML = (d.recent_renders || []).map(r => `
+        <tr>
+          <td>${r.ts}</td>
+          <td>${r.region}</td>
+          <td><code>${r.ip}</code></td>
+          <td><strong>《${r.title}》</strong></td>
+          <td>${r.author}</td>
+          <td>${r.char_count} 字</td>
+          <td><span class="tag">${r.edition} · ${r.style}</span></td>
+        </tr>
+      `).join('') || '<tr><td colspan="7" style="color:#888;">暂无生成记录</td></tr>';
+
+      const tbV = document.getElementById('tb_visitors');
+      tbV.innerHTML = (d.recent_visitors || []).map(v => {
+        const isWx = v.channel.includes('微信');
+        return `
+          <tr>
+            <td>${v.ts}</td>
+            <td>${v.region}</td>
+            <td><code>${v.ip}</code></td>
+            <td><span class="tag ${isWx ? 'tag-wx' : ''}">${v.channel}</span></td>
+            <td>${v.device}</td>
+            <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.referrer}</td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="6" style="color:#888;">暂无访客记录</td></tr>';
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', loadStats);
+</script>
+</body>
+</html>
