@@ -272,7 +272,7 @@
   <div class="panel">
     <div class="panel-title">
       <span>题写诗词正文</span>
-      <span class="quota-pill" id="quotaBadge">每日限免：2 幅 / IP</span>
+      <span class="quota-pill" id="quotaBadge">每小时限免：10 幅 / IP</span>
     </div>
 
     <label class="field-label">经典名篇一键体验：</label>
@@ -450,7 +450,14 @@
         genre = '五言古近体诗 → 自动排入 10列×15行 正方形册页（首列独立低起题款，正文每列恰好三句15字）';
       }
     }
-    return { title, author, body, rows, genre };
+    const cleanChars = Array.from(body).filter(c => !/\s/.test(c) && !'，。、；：？！“”‘’（）《》「」『』—…'.includes(c));
+    const availCols = 10 - (title ? 1 : 0);
+    const reservedTail = title ? 0 : 6;
+    const maxPageChars = (availCols - 1) * rows + Math.max(2, rows - reservedTail);
+    const pageHint = cleanChars.length > maxPageChars
+      ? ` ｜ ⚠️ 当前正文 ${cleanChars.length} 字超出单页上限（${maxPageChars} 字），将自动仅排版第一页`
+      : ` ｜ 单页容量：${cleanChars.length} / ${maxPageChars} 字`;
+    return { title, author, body, rows, genre: genre + pageHint, maxPageChars };
   }
 
   function updateSmartBanner() {
@@ -525,7 +532,8 @@
       const r = await fetch(`${apiBase}/api/quota`);
       if (r.ok) {
         const d = await r.json();
-        document.getElementById('quotaBadge').textContent = `今日剩余免费：${d.remaining} / ${d.daily_limit} 幅`;
+        const lim = d.hourly_limit || d.daily_limit || 10;
+        document.getElementById('quotaBadge').textContent = `本小时剩余免费：${d.remaining} / ${lim} 幅`;
       }
     } catch (e) {}
   }
@@ -543,7 +551,7 @@
     }
     const btn = document.getElementById('renderBtn');
     btn.disabled = true;
-    btn.textContent = '正在研墨挥毫生成中（约1秒）...';
+    btn.textContent = '正在研墨挥毫生成中（约1~2秒）...';
     try {
       const resp = await fetch(`${apiBase}/api/render`, {
         method: 'POST',
@@ -567,12 +575,14 @@
       }
       const rem = resp.headers.get('X-Quota-Remaining');
       if (rem !== null) {
-        document.getElementById('quotaBadge').textContent = `今日剩余免费：${rem} / 2 幅`;
+        document.getElementById('quotaBadge').textContent = `本小时剩余免费：${rem} / 10 幅`;
       }
       const blob = await resp.blob();
       const objUrl = URL.createObjectURL(blob);
       document.getElementById('resultImg').src = objUrl;
-      document.getElementById('downloadLink').href = objUrl;
+      const dl = document.getElementById('downloadLink');
+      dl.href = objUrl;
+      dl.download = '刘春霖小楷书法作品.jpg';
     } catch (err) {
       alert('无法连接 Ubuntu 渲染主机，请检查主机服务或 Cloudflare Tunnel 是否已启动。');
     } finally {

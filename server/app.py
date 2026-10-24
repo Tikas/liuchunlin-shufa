@@ -52,13 +52,14 @@ SIMP_TTF_PATH = PRIVATE_FONT_DIR / "LiuChunlin-ShengJiaoXu-Simp.ttf"
 VARIANTS_MAP_PATH = PRIVATE_FONT_DIR / "LiuChunlin-Variants-Map.json"
 QUOTA_DB_PATH = Path(os.environ.get("LIUCHUNLIN_QUOTA_DB", str(HERE / "ip_quota.sqlite3")))
 SITE_URL = os.environ.get("LIUCHUNLIN_SITE_URL", "https://dvbs2000.github.io/liuchunlin-shufa/")
-DAILY_IP_LIMIT = int(os.environ.get("LIUCHUNLIN_DAILY_LIMIT", "2"))
+HOURLY_IP_LIMIT = int(os.environ.get("LIUCHUNLIN_HOURLY_LIMIT", "10"))
 
 # Load PUA variant lookup tables once at startup
 with open(VARIANTS_MAP_PATH, "r", encoding="utf-8") as f:
     _VARIANTS_PAYLOAD = json.load(f)["pua_variants"]
 
 _DB_LOCK = threading.Lock()
+_RENDER_LOCK = threading.Lock()
 
 
 def _init_quota_db() -> None:
@@ -66,11 +67,11 @@ def _init_quota_db() -> None:
     with sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
         conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS ip_daily_quota (
+            CREATE TABLE IF NOT EXISTS ip_hourly_quota (
                 ip TEXT NOT NULL,
-                day TEXT NOT NULL,
+                hour_bucket TEXT NOT NULL,
                 used_count INTEGER NOT NULL DEFAULT 0,
-                PRIMARY KEY (ip, day)
+                PRIMARY KEY (ip, hour_bucket)
             )
             """
         )
@@ -96,31 +97,31 @@ def get_client_ip(request: Request) -> str:
 
 def check_and_consume_quota(ip: str, consume: bool = True) -> Tuple[bool, int]:
     """
-    Check if `ip` has remaining quota today (`DAILY_IP_LIMIT = 2`).
+    Check if `ip` has remaining quota in the current hour (`HOURLY_IP_LIMIT = 10`).
     Returns `(allowed, remaining_after)`.
     """
-    today = datetime.date.today().isoformat()
+    hour_bucket = datetime.datetime.now().strftime("%Y-%m-%dT%H")
     with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
         row = conn.execute(
-            "SELECT used_count FROM ip_daily_quota WHERE ip = ? AND day = ?",
-            (ip, today),
+            "SELECT used_count FROM ip_hourly_quota WHERE ip = ? AND hour_bucket = ?",
+            (ip, hour_bucket),
         ).fetchone()
         used = int(row[0]) if row else 0
         if not consume:
-            return (used < DAILY_IP_LIMIT), max(0, DAILY_IP_LIMIT - used)
-        if used >= DAILY_IP_LIMIT:
+            return (used < HOURLY_IP_LIMIT), max(0, HOURLY_IP_LIMIT - used)
+        if used >= HOURLY_IP_LIMIT:
             return False, 0
         new_used = used + 1
         conn.execute(
             """
-            INSERT INTO ip_daily_quota (ip, day, used_count)
+            INSERT INTO ip_hourly_quota (ip, hour_bucket, used_count)
             VALUES (?, ?, ?)
-            ON CONFLICT(ip, day) DO UPDATE SET used_count = excluded.used_count
+            ON CONFLICT(ip, hour_bucket) DO UPDATE SET used_count = excluded.used_count
             """,
-            (ip, today, new_used),
+            (ip, hour_bucket, new_used),
         )
         conn.commit()
-        return True, max(0, DAILY_IP_LIMIT - new_used)
+        return True, max(0, HOURLY_IP_LIMIT - new_used)
 
 
 # ---------------------------------------------------------------------------
@@ -313,7 +314,13 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["X-Quota-Remaining", "X-Detected-Title", "X-Detected-Author"],
+    expose_headers=[
+        "X-Quota-Remaining",
+        "X-Detected-Title",
+        "X-Detected-Author",
+        "X-Page-Truncated",
+        "X-Max-Page-Chars",
+    ],
 )
 
 
@@ -327,7 +334,7 @@ async def block_font_probing_middleware(request: Request, call_next):
 
 
 class RenderRequest(BaseModel):
-    text: str = Field(..., min_length=1, max_length=600)
+    text: str = Field(..., min_length=1, max_length=2500)
     title: str = Field(default="", max_length=16)
     author: str = Field(default="", max_length=10)
     colophon: str = Field(default="", max_length=12)
@@ -339,11 +346,16 @@ class RenderRequest(BaseModel):
 async def get_quota_status(request: Request):
     ip = get_client_ip(request)
     allowed, rem = check_and_consume_quota(ip, consume=False)
-    return {"allowed": allowed, "remaining": rem, "daily_limit": DAILY_IP_LIMIT}
+    return {
+        "allowed": allowed,
+        "remaining": rem,
+        "hourly_limit": HOURLY_IP_LIMIT,
+        "daily_limit": HOURLY_IP_LIMIT,
+    }
 
 
 @app.post("/api/render")
-async def render_calligraphy_endpoint(req: RenderRequest, request: Request):
+def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     ip = get_client_ip(request)
 
     # Smart parse title, author, and body text
@@ -351,15 +363,13 @@ async def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     clean_body = [c for c in body if not c.isspace() and c not in "，。、；：？！“”‘’（）《》「」『』—…"]
     if len(clean_body) < 2:
         raise HTTPException(status_code=400, detail="请输入至少 2 个汉字的正文内容。")
-    if len(clean_body) > 260:
-        raise HTTPException(status_code=400, detail="单幅册页正文建议不超过 260 个汉字。")
 
-    # Enforce strict 2 generations per IP per day quota
+    # Enforce strict 10 generations per IP per hour quota
     allowed, remaining = check_and_consume_quota(ip, consume=True)
     if not allowed:
         raise HTTPException(
             status_code=429,
-            detail=f"今日墨池已歇（每 IP 每日最多免费生成 {DAILY_IP_LIMIT} 幅作品），请明日再来雅集！",
+            detail=f"本小时墨池已歇（每 IP 每小时最多免费生成 {HOURLY_IP_LIMIT} 幅作品），请稍候再来雅集！",
         )
 
     edition = req.edition
@@ -376,34 +386,43 @@ async def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     default_colophon = "" if has_title_col else ("春霖敬書" if edition == "trad" else "刘春霖书")
     colophon = req.colophon.strip() or default_colophon
 
-    page_img = render_copybook_page(
-        text=body,
-        ttf_path=ttf_path,
-        pua_variants=vmap,
-        colophon=colophon,
-        poem_title=title,
-        poem_author=author,
-        num_cols=10,
-        rows_per_col=rows_per_col,
-        cell_pitch_px=cell_pitch_px,
-        col_pitch_px=col_pitch_px,
-        glyph_scale_in_cell=glyph_scale,
-        ruling_style=style,
-        seed=2026,
-        export_svg_path=None,  # NEVER export SVG in public web service
-    )
+    # Strictly process ONLY 1 page (`num_cols = 10`)
+    avail_body_cols = 10 - (1 if has_title_col else 0)
+    reserved_tail_rows = (len(colophon) + 2) if colophon else 0
+    max_page_chars = (avail_body_cols - 1) * rows_per_col + max(2, rows_per_col - reserved_tail_rows)
+    was_truncated = len(clean_body) > max_page_chars
+    one_page_body = "".join(clean_body[:max_page_chars])
 
-    final_img = attach_museum_qr_footer(page_img, edition=edition, site_url=SITE_URL)
+    with _RENDER_LOCK:
+        page_img = render_copybook_page(
+            text=one_page_body,
+            ttf_path=ttf_path,
+            pua_variants=vmap,
+            colophon=colophon,
+            poem_title=title,
+            poem_author=author,
+            num_cols=10,
+            rows_per_col=rows_per_col,
+            cell_pitch_px=cell_pitch_px,
+            col_pitch_px=col_pitch_px,
+            glyph_scale_in_cell=glyph_scale,
+            ruling_style=style,
+            seed=2026,
+            export_svg_path=None,  # NEVER export SVG in public web service
+        )
+        final_img = attach_museum_qr_footer(page_img, edition=edition, site_url=SITE_URL)
 
-    buf = io.BytesIO()
-    final_img.save(buf, format="PNG", optimize=True)
-    png_bytes = buf.getvalue()
+        buf = io.BytesIO()
+        final_img.save(buf, format="JPEG", quality=92, subsampling=0, optimize=True)
+        img_bytes = buf.getvalue()
 
     return Response(
-        content=png_bytes,
-        media_type="image/png",
+        content=img_bytes,
+        media_type="image/jpeg",
         headers={
             "X-Quota-Remaining": str(remaining),
+            "X-Page-Truncated": "1" if was_truncated else "0",
+            "X-Max-Page-Chars": str(max_page_chars),
             "Cache-Control": "no-store",
         },
     )

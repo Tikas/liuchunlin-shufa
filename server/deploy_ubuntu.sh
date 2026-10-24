@@ -50,8 +50,8 @@ WorkingDirectory=${INSTALL_DIR}/v003
 Environment="LIUCHUNLIN_FONT_DIR=${INSTALL_DIR}/v003/output"
 Environment="LIUCHUNLIN_QUOTA_DB=${INSTALL_DIR}/ip_quota.sqlite3"
 Environment="LIUCHUNLIN_SITE_URL=https://dvbs2000.github.io/liuchunlin-shufa/"
-Environment="LIUCHUNLIN_DAILY_LIMIT=2"
-ExecStart=${INSTALL_DIR}/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8088 --workers 2
+Environment="LIUCHUNLIN_HOURLY_LIMIT=10"
+ExecStart=${INSTALL_DIR}/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8088 --workers 1
 Restart=always
 RestartSec=3
 
