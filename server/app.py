@@ -820,14 +820,14 @@ def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     if not is_in_classical_whitelist(body, poem_id=req.poem_id):
         raise HTTPException(
             status_code=403,
-            detail="当前仅支持搜索《传世唐诗宋词·古文经典库》名篇体验生成。如需输入自定义文字，请联系邮箱 sdicfund@hotmail.com",
+            detail="由于合规原因，如需输入自定义文字，请联系邮箱 sdicfund@hotmail.com",
         )
     # Enforce 10 generations per IP per hour quota
     allowed, remaining = check_and_consume_quota(ip, consume=True)
     if not allowed:
         raise HTTPException(
             status_code=429,
-            detail=f"本小时墨池已歇（每 IP 每小时最多免费生成 {HOURLY_IP_LIMIT} 幅古诗词），如需输入自定义文字请联系邮箱 sdicfund@hotmail.com",
+            detail=f"本小时墨池已歇（每 IP 每小时最多免费生成 {HOURLY_IP_LIMIT} 幅古诗词）。由于合规原因，如需输入自定义文字，请联系邮箱 sdicfund@hotmail.com",
         )
     is_vip = False
     vip_rem = -1

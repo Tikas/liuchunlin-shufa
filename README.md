@@ -1,6 +1,6 @@
 # 刘春霖 AI 小楷书房 · 在线诗词书法生成系统
 
-> **✨ 对 AI 生成书法作品有兴趣可联系微信 `2480555` 加群 ｜ 如需输入自定义文字请联系邮箱 `sdicfund@hotmail.com`**
+> **由于合规原因，如需输入自定义文字，请联系邮箱 `sdicfund@hotmail.com`**
 >
 > 🌐 **在线体验网站（GitHub Pages 点开即用）**：**[https://dvbs2000.github.io/liuchunlin-shufa/](https://dvbs2000.github.io/liuchunlin-shufa/)**
 
@@ -59,4 +59,4 @@
 
 | 《兰亭集序》（简体 · 仿古无格素笺 · 10×13） | 交流与定制 |
 | :---: | :---: |
-| ![兰亭集序简体素笺](docs/gallery/lanting_simp.jpg) | **在线体验**：<br>[https://dvbs2000.github.io/liuchunlin-shufa/](https://dvbs2000.github.io/liuchunlin-shufa/)<br><br>**技术交流与定制**：<br>对 AI 生成书法作品有兴趣可联系微信 **`2480555`** 加群 |
+| ![兰亭集序简体素笺](docs/gallery/lanting_simp.jpg) | **在线体验**：<br>[https://dvbs2000.github.io/liuchunlin-shufa/](https://dvbs2000.github.io/liuchunlin-shufa/)<br><br>**定制说明**：<br>由于合规原因，如需输入自定义文字，请联系邮箱 **`sdicfund@hotmail.com`** |
