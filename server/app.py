@@ -707,8 +707,18 @@ async def get_quota_status(request: Request, ref: str = "", src: str = "", track
     }
 
 
+@app.get("/admin")
+async def serve_private_admin_dashboard():
+    html_p = HERE / "admin_dashboard.html"
+    if not html_p.exists():
+        raise HTTPException(status_code=404, detail="Not Found")
+    return Response(content=html_p.read_text(encoding="utf-8"), media_type="text/html; charset=utf-8")
+
+
 @app.get("/api/stats")
-async def get_visitor_stats():
+async def get_visitor_stats(key: str = ""):
+    if key.strip() != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="管理员密码错误，拒绝访问统计数据")
     _, today = _now_bjt()
     with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
         today_pv = conn.execute("SELECT COUNT(*) FROM visitor_logs WHERE day = ?", (today,)).fetchone()[0]
