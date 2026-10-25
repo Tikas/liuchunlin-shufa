@@ -22,13 +22,15 @@ import datetime
 import io
 import json
 import os
+import random
 import re
 import sqlite3
+import string
 import sys
 import threading
 import urllib.request
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import cv2
 import numpy as np
@@ -54,10 +56,129 @@ VARIANTS_MAP_PATH = PRIVATE_FONT_DIR / "LiuChunlin-Variants-Map.json"
 QUOTA_DB_PATH = Path(os.environ.get("LIUCHUNLIN_QUOTA_DB", str(HERE / "ip_quota.sqlite3")))
 SITE_URL = os.environ.get("LIUCHUNLIN_SITE_URL", "https://dvbs2000.github.io/liuchunlin-shufa/")
 HOURLY_IP_LIMIT = int(os.environ.get("LIUCHUNLIN_HOURLY_LIMIT", "10"))
+ADMIN_SECRET = os.environ.get("LIUCHUNLIN_ADMIN_KEY", "2480555")
 
 # Load PUA variant lookup tables once at startup
 with open(VARIANTS_MAP_PATH, "r", encoding="utf-8") as f:
     _VARIANTS_PAYLOAD = json.load(f)["pua_variants"]
+
+# Load Simplified <-> Traditional character conversion dictionaries
+_TS_MAP_PATH = HERE / "trad_simp_map.json"
+if _TS_MAP_PATH.exists():
+    with open(_TS_MAP_PATH, "r", encoding="utf-8") as f:
+        _ts_data = json.load(f)
+        _S2T: Dict[str, str] = _ts_data.get("s2t", {})
+        _T2S: Dict[str, str] = _ts_data.get("t2s", {})
+else:
+    _S2T, _T2S = {}, {}
+
+
+def to_simp_text(s: str) -> str:
+    return "".join(_T2S.get(c, c) for c in s)
+
+
+def to_trad_text(s: str) -> str:
+    return "".join(_S2T.get(c, c) for c in s)
+
+
+def convert_for_edition(s: str, edition: str) -> str:
+    return to_trad_text(s) if edition == "trad" else to_simp_text(s)
+
+
+def strip_cjk_punct(s: str) -> str:
+    return "".join(
+        c for c in s if not c.isspace() and c not in "，。、；：？！“”‘’（）《》「」『』—…·.,!?;:()[]【】"
+    )
+
+
+# Load Classical Anthology Whitelist (`anthology.json`)
+_ANTHOLOGY_PATH = HERE / "anthology.json"
+if not _ANTHOLOGY_PATH.exists():
+    _ANTHOLOGY_PATH = HERE.parent / "docs" / "anthology.json"
+
+_WHITELIST_POEM_IDS: Dict[str, dict] = {}
+_WHITELIST_CLEAN_SIMP_CORPUS: List[str] = []
+if _ANTHOLOGY_PATH.exists():
+    with open(_ANTHOLOGY_PATH, "r", encoding="utf-8") as f:
+        for item in json.load(f):
+            pid = item.get("id", "")
+            if pid:
+                _WHITELIST_POEM_IDS[pid] = item
+            clean_s = strip_cjk_punct(to_simp_text(item.get("c_simp", "") or item.get("c_trad", "")))
+            if len(clean_s) >= 8:
+                _WHITELIST_CLEAN_SIMP_CORPUS.append(clean_s)
+
+
+def is_in_classical_whitelist(body_text: str, poem_id: str = "") -> bool:
+    """Verify if `body_text` belongs to the 963-poem classical anthology whitelist."""
+    clean_in = strip_cjk_punct(to_simp_text(body_text))
+    if len(clean_in) < 8:
+        return False
+    if poem_id and poem_id in _WHITELIST_POEM_IDS:
+        item = _WHITELIST_POEM_IDS[poem_id]
+        ref_s = strip_cjk_punct(to_simp_text(item.get("c_simp", "")))
+        if clean_in in ref_s or ref_s in clean_in:
+            return True
+    for ref_s in _WHITELIST_CLEAN_SIMP_CORPUS:
+        if clean_in in ref_s or ref_s in clean_in:
+            return True
+    return False
+
+
+# Multi-category Illegal & Sensitive Content Filter + Acrostic Horizontal Row Scanner
+_SENSITIVE_KEYWORDS = [
+    # Political / Subversive / Sensitive
+    "习近平", "毛泽东", "江泽民", "胡锦涛", "温家宝", "李克强", "邓小平", "周恩来",
+    "共产党", "国民党", "法轮功", "真善忍", "天安门", "六四", "八九", "学潮", "独裁",
+    "暴政", "推翻", "打倒", "政权", "游行", "示威", "罢工", "维权", "台独", "藏独",
+    "疆独", "港独", "自由亚洲", "大纪元", "新唐人", "动态网", "翻墙", "梯子", "靖国神社",
+    # Profanity / Insults / Abuse
+    "傻逼", "煞笔", "草泥马", "操你", "日你", "妈的", "他妈", "去死", "混蛋", "王八蛋",
+    "狗日", "贱人", "婊子", "妓女", "脑残", "智障", "废物", "畜生", "杂种", "滚蛋",
+    "尼玛", "卧槽", "我操", "狗官", "贪官", "黑警", "杀光", "砍死", "炸死", "自杀",
+    # Porn / Gambling / Fraud / Illegal Ads
+    "色情", "淫秽", "强奸", "乱伦", "裸聊", "约炮", "援交", "嫖娼", "卖淫", "成人网站",
+    "赌场", "赌博", "博彩", "六合彩", "时时彩", "百家乐", "网贷", "套现", "洗钱", "毒品",
+    "冰毒", "海洛因", "大麻", "枪支", "弹药", "发票", "办证", "加微", "加V", "招代理",
+]
+
+
+def check_text_legality(
+    title: str, author: str, colophon: str, body: str, rows_per_col: int = 14
+) -> Tuple[bool, str]:
+    """
+    2-Layer Content Legality Verification for Paid VIP Custom Text:
+    1. Direct normalized Simplified scan of `title`, `author`, `colophon`, and `body`.
+    2. Vertical Calligraphic Grid Horizontal / Acrostic Scan (`防藏头诗与横向连读夹带检测`):
+       Builds the `10 x rows_per_col` vertical grid and inspects every horizontal row
+       (right-to-left and left-to-right) so hidden vertical/horizontal acrostics are blocked.
+    """
+    combined = to_simp_text(f"{title} {author} {colophon} {body}")
+    combined_compact = strip_cjk_punct(combined)
+
+    # Reject phone numbers / WeChat IDs / URLs in custom calligraphy to prevent spam/scam posters
+    if re.search(r"(?:1[3-9]\d{9}|http://|https://|www\.|\.com|\.cn|vx|weixin)", combined.lower()):
+        return False, "自定义书法内容不可包含网址、手机号或微信号等广告引流信息。"
+
+    for kw in _SENSITIVE_KEYWORDS:
+        if kw in combined or kw in combined_compact:
+            return False, "您输入的内容包含敏感或不当词汇，书房雅集仅支持健康雅正之诗词文稿。"
+
+    # Layer 2: Construct the 10-column vertical matrix and scan every horizontal line (防藏头诗)
+    clean_chars = list(strip_cjk_punct(to_simp_text(body)))
+    if clean_chars and rows_per_col > 0:
+        cols: List[List[str]] = []
+        for idx in range(0, min(len(clean_chars), 10 * rows_per_col), rows_per_col):
+            cols.append(clean_chars[idx : idx + rows_per_col])
+        for r in range(rows_per_col):
+            row_rtl = "".join(col[r] for col in cols if r < len(col))
+            row_ltr = row_rtl[::-1]
+            for kw in _SENSITIVE_KEYWORDS:
+                if len(kw) >= 2 and (kw in row_rtl or kw in row_ltr):
+                    return False, "检测到竖排藏头或横向连读中包含不当词汇，请修改后重试。"
+
+    return True, "OK"
+
 
 _DB_LOCK = threading.Lock()
 _RENDER_LOCK = threading.Lock()
@@ -113,6 +234,24 @@ def _init_quota_db() -> None:
                 style TEXT NOT NULL,
                 region TEXT NOT NULL DEFAULT '解析中...'
             )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS vip_codes (
+                code TEXT PRIMARY KEY,
+                note TEXT NOT NULL,
+                remaining_uses INTEGER NOT NULL,
+                total_uses INTEGER NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        # Ensure master admin/test VIP code exists
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO vip_codes (code, note, remaining_uses, total_uses, created_at)
+            VALUES ('VIP2480555', '站长自用主通行码', 9999, 9999, '2026-10-25 10:00:00')
             """
         )
         conn.commit()
@@ -464,6 +603,7 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=[
         "X-Quota-Remaining",
+        "X-VIP-Remaining",
         "X-Detected-Title",
         "X-Detected-Author",
         "X-Page-Truncated",
@@ -488,6 +628,67 @@ class RenderRequest(BaseModel):
     colophon: str = Field(default="", max_length=12)
     edition: str = Field(default="simp", pattern="^(trad|simp)$")
     style: str = Field(default="zhalan", pattern="^(zhalan|clean)$")
+    poem_id: str = Field(default="", max_length=16)
+    vip_code: str = Field(default="", max_length=32)
+
+
+class VipCreateRequest(BaseModel):
+    admin_key: str = Field(..., min_length=1, max_length=64)
+    note: str = Field(default="微信付费用户", max_length=64)
+    uses: int = Field(default=50, ge=1, le=99999)
+    custom_code: str = Field(default="", max_length=24)
+
+
+def verify_and_consume_vip(code: str, consume: bool = False) -> Tuple[bool, int, str]:
+    clean_c = code.strip().upper()
+    if not clean_c:
+        return False, 0, ""
+    with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+        row = conn.execute(
+            "SELECT remaining_uses, total_uses, note FROM vip_codes WHERE UPPER(code) = ?",
+            (clean_c,),
+        ).fetchone()
+        if not row:
+            return False, 0, ""
+        rem, tot, note = int(row[0]), int(row[1]), str(row[2])
+        if rem <= 0:
+            return False, 0, note
+        if consume:
+            new_rem = rem - 1
+            conn.execute(
+                "UPDATE vip_codes SET remaining_uses = ? WHERE UPPER(code) = ?",
+                (new_rem, clean_c),
+            )
+            conn.commit()
+            return True, new_rem, note
+        return True, rem, note
+
+
+@app.get("/api/vip/verify")
+async def verify_vip_endpoint(code: str = ""):
+    ok, rem, note = verify_and_consume_vip(code, consume=False)
+    return {"valid": ok, "remaining": rem, "note": note}
+
+
+@app.post("/api/vip/create")
+async def create_vip_endpoint(req: VipCreateRequest):
+    if req.admin_key.strip() != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="管理员密钥错误")
+    code = req.custom_code.strip().upper()
+    if not code:
+        alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+        code = "VIP" + "".join(random.choice(alphabet) for _ in range(5))
+    ts, _ = _now_bjt()
+    with _DB_LOCK, sqlite3.connect(str(QUOTA_DB_PATH)) as conn:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO vip_codes (code, note, remaining_uses, total_uses, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (code, req.note.strip() or "微信VIP用户", req.uses, req.uses, ts),
+        )
+        conn.commit()
+    return {"code": code, "note": req.note, "uses": req.uses, "created_at": ts}
 
 
 @app.get("/api/quota")
@@ -538,6 +739,9 @@ async def get_visitor_stats():
         rec_visitors = conn.execute(
             "SELECT ts, ip, region, channel, device, referrer FROM visitor_logs ORDER BY id DESC LIMIT 50"
         ).fetchall()
+        vip_rows = conn.execute(
+            "SELECT code, note, remaining_uses, total_uses, created_at FROM vip_codes ORDER BY created_at DESC LIMIT 50"
+        ).fetchall()
 
     denom = max(1, total_pv)
     return {
@@ -559,6 +763,16 @@ async def get_visitor_stats():
         ],
         "devices": [
             {"name": r[0], "count": r[1], "pct": round(r[1] * 100.0 / denom, 1)} for r in dev_rows
+        ],
+        "vip_codes": [
+            {
+                "code": r[0],
+                "note": r[1],
+                "remaining_uses": r[2],
+                "total_uses": r[3],
+                "created_at": r[4],
+            }
+            for r in vip_rows
         ],
         "recent_renders": [
             {
@@ -597,39 +811,82 @@ def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     if len(clean_body) < 2:
         raise HTTPException(status_code=400, detail="请输入至少 2 个汉字的正文内容。")
 
-    # Enforce strict 10 generations per IP per hour quota
-    allowed, remaining = check_and_consume_quota(ip, consume=True)
-    if not allowed:
-        raise HTTPException(
-            status_code=429,
-            detail=f"本小时墨池已歇（每 IP 每小时最多免费生成 {HOURLY_IP_LIMIT} 幅作品），请稍候再来雅集！",
-        )
-
     edition = req.edition
     style = req.style
+    has_title_col = bool(title)
+    rows_per_col = detect_optimal_rows_per_col(body, has_title_col=has_title_col, ruling_style=style)
+
+    # Check if request is using a paid VIP passcode or Free Classical Anthology mode
+    vip_code_str = req.vip_code.strip()
+    is_vip = False
+    vip_rem = -1
+
+    if vip_code_str:
+        ok_vip, vip_rem_check, vip_note = verify_and_consume_vip(vip_code_str, consume=False)
+        if not ok_vip:
+            raise HTTPException(
+                status_code=403,
+                detail="您输入的 VIP 创作通行码无效或剩余次数已用尽，请联系微信 2480555 开通或续期！",
+            )
+        # Validate legality + vertical acrostics BEFORE consuming VIP quota
+        legal_ok, legal_msg = check_text_legality(
+            title=title,
+            author=author,
+            colophon=req.colophon,
+            body=body,
+            rows_per_col=rows_per_col,
+        )
+        if not legal_ok:
+            raise HTTPException(status_code=400, detail=legal_msg)
+        _, vip_rem, _ = verify_and_consume_vip(vip_code_str, consume=True)
+        is_vip = True
+        remaining = 10
+    else:
+        # Free Mode: MUST belong to the 963-work Classical Tang/Song/Prose Whitelist!
+        if not is_in_classical_whitelist(body, poem_id=req.poem_id):
+            raise HTTPException(
+                status_code=403,
+                detail="免费模式仅支持生成《传世唐诗宋词·古文经典库》内的名篇（可在上方搜索框免费搜任意唐诗宋词）。如需题写自定义文字或专属落款，请加微信 2480555 获取 VIP 通行码！",
+            )
+        # Enforce 10 generations per IP per hour quota for Free Mode
+        allowed, remaining = check_and_consume_quota(ip, consume=True)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail=f"本小时免费墨池已歇（每 IP 每小时免费生成 {HOURLY_IP_LIMIT} 幅古诗词），如需无限畅享或自定义文字请联系微信 2480555！",
+            )
+
     ttf_path = TRAD_TTF_PATH if edition == "trad" else SIMP_TTF_PATH
     vmap = _VARIANTS_PAYLOAD[edition]
 
-    has_title_col = bool(title)
-    rows_per_col = detect_optimal_rows_per_col(body, has_title_col=has_title_col, ruling_style=style)
+    # Automatically convert characters to match selected edition (Traditional vs Simplified)
+    title_conv = convert_for_edition(title, edition)
+    author_conv = convert_for_edition(author, edition)
+    body_conv = convert_for_edition(body, edition)
+    clean_body_conv = [
+        c for c in body_conv if not c.isspace() and c not in "，。、；：？！“”‘’（）《》「」『』—…"
+    ]
+
     cell_pitch_px = 96 if rows_per_col == 14 else (92 if rows_per_col >= 15 else 100)
     col_pitch_px = 126 if style == "zhalan" else 128
     glyph_scale = 1.16 if rows_per_col == 14 else (1.18 if style == "zhalan" else 1.12)
 
     default_colophon = "" if has_title_col else ("春霖敬書" if edition == "trad" else "刘春霖书")
-    colophon = req.colophon.strip() or default_colophon
+    raw_colophon = req.colophon.strip() if is_vip else ""
+    colophon = convert_for_edition(raw_colophon, edition) or default_colophon
 
     # Strictly process ONLY 1 page (`num_cols = 10`)
     avail_body_cols = 10 - (1 if has_title_col else 0)
     reserved_tail_rows = (len(colophon) + 2) if colophon else 0
     max_page_chars = (avail_body_cols - 1) * rows_per_col + max(2, rows_per_col - reserved_tail_rows)
-    was_truncated = len(clean_body) > max_page_chars
-    one_page_body = "".join(clean_body[:max_page_chars])
+    was_truncated = len(clean_body_conv) > max_page_chars
+    one_page_body = "".join(clean_body_conv[:max_page_chars])
 
+    tag_prefix = "[VIP自定义] " if is_vip else "[免费古籍] "
     record_render_event(
         ip=ip,
-        title=title,
-        author=author or colophon,
+        title=tag_prefix + (title_conv or "无题"),
+        author=author_conv or colophon,
         char_count=len(one_page_body),
         edition=edition,
         style=style,
@@ -641,8 +898,8 @@ def render_calligraphy_endpoint(req: RenderRequest, request: Request):
             ttf_path=ttf_path,
             pua_variants=vmap,
             colophon=colophon,
-            poem_title=title,
-            poem_author=author,
+            poem_title=title_conv,
+            poem_author=author_conv,
             num_cols=10,
             rows_per_col=rows_per_col,
             cell_pitch_px=cell_pitch_px,
@@ -658,13 +915,17 @@ def render_calligraphy_endpoint(req: RenderRequest, request: Request):
         final_img.save(buf, format="JPEG", quality=92, subsampling=0, optimize=True)
         img_bytes = buf.getvalue()
 
+    resp_headers = {
+        "X-Quota-Remaining": str(remaining),
+        "X-Page-Truncated": "1" if was_truncated else "0",
+        "X-Max-Page-Chars": str(max_page_chars),
+        "Cache-Control": "no-store",
+    }
+    if is_vip:
+        resp_headers["X-VIP-Remaining"] = str(vip_rem)
+
     return Response(
         content=img_bytes,
         media_type="image/jpeg",
-        headers={
-            "X-Quota-Remaining": str(remaining),
-            "X-Page-Truncated": "1" if was_truncated else "0",
-            "X-Max-Page-Chars": str(max_page_chars),
-            "Cache-Control": "no-store",
-        },
+        headers=resp_headers,
     )

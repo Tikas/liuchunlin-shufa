@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>刘春霖 AI 小楷书房 · 访客来源与微信扫码裂变实时分析看板</title>
+  <title>刘春霖 AI 小楷书房 · VIP 发卡台与访客裂变实时统计看板</title>
   <style>
     :root {
       --bg-paper: #efe8d8;
@@ -31,6 +31,56 @@
     header h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 6px; }
     header p { font-size: 13px; color: #cbbda6; }
     .wrap { max-width: 1180px; margin: 20px auto; padding: 0 16px; }
+    .vip-console {
+      background: linear-gradient(135deg, #2b241d 0%, #3d3126 100%);
+      color: #f7ebd2;
+      border: 1.5px solid #d4af6a;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .vip-console h2 {
+      color: #ffd984;
+      font-size: 16.5px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(212, 175, 106, 0.35);
+      padding-bottom: 8px;
+    }
+    .vip-form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .vip-form-row input, .vip-form-row select {
+      padding: 8px 11px;
+      border-radius: 5px;
+      border: 1px solid #c8a45c;
+      background: #fffdf8;
+      font-size: 13.5px;
+      color: #222;
+    }
+    .vip-gen-btn {
+      background: var(--cinnabar);
+      color: #fff;
+      border: 1px solid #ffd984;
+      padding: 8px 16px;
+      border-radius: 5px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .vip-result-box {
+      margin-top: 12px;
+      background: rgba(0,0,0,0.28);
+      border: 1px dashed #d4af6a;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #a8f0c6;
+      display: none;
+    }
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -110,11 +160,29 @@
 <body>
 
 <header>
-  <h1>刘春霖 AI 小楷书房 · 访客与裂变统计看板</h1>
-  <p>实时追踪访问人数 (PV/UV)、微信长按二维码裂变占比、外部来源网址、访客地区及实时挥毫记录</p>
+  <h1>刘春霖 AI 小楷书房 · VIP 一键发卡台与访客统计看板</h1>
+  <p>微信付费客户一秒生成 VIP 创作通行码 · 实时追踪访问人数、微信扫码占比、访客地区及挥毫记录</p>
 </header>
 
 <div class="wrap">
+  <!-- 顶部：VIP 通行码一键发卡台 -->
+  <div class="vip-console">
+    <h2>🔑 微信付费客户 · VIP 创作通行码一键发卡台（生成后自动复制微信回复话术与免输激活链接）</h2>
+    <div class="vip-form-row">
+      <input type="password" id="admKey" value="2480555" placeholder="管理员密钥" style="width:130px;" />
+      <input type="text" id="vipNote" placeholder="客户微信备注（如：微信好友-王先生）" style="flex:1;min-width:180px;" />
+      <select id="vipUses">
+        <option value="20">20 幅体验卡</option>
+        <option value="50" selected>50 幅标准卡</option>
+        <option value="200">200 幅尊享卡</option>
+        <option value="999">999 幅包年/无限卡</option>
+      </select>
+      <input type="text" id="vipCustomCode" placeholder="自选码(可留空自动生成)" style="width:165px;" />
+      <button type="button" class="vip-gen-btn" onclick="createVipCode()">⚡ 一键生成 VIP 码并复制微信发卡话术</button>
+    </div>
+    <div class="vip-result-box" id="vipResultBox"></div>
+  </div>
+
   <div class="kpi-grid">
     <div class="kpi-card"><div class="kpi-label">今日访问人次 (PV)</div><div class="kpi-val" id="k_today_pv">-</div></div>
     <div class="kpi-card"><div class="kpi-label">今日独立访客 (UV)</div><div class="kpi-val" id="k_today_uv">-</div></div>
@@ -125,9 +193,22 @@
     <div class="kpi-card"><div class="kpi-label">微信扫码/朋友圈占比</div><div class="kpi-val" id="k_wx_pct">-</div></div>
   </div>
 
+  <!-- 已开通 VIP 通行码列表 -->
+  <div class="panel">
+    <h2><span>👑 已发放 VIP 创作通行码列表（点击「复制发卡话术」可随时重发给客户）</span><button class="btn-refresh" onclick="loadStats()">刷新数据</button></h2>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>VIP 通行码</th><th>客户微信备注</th><th>剩余可用次数</th><th>总次数</th><th>开通时间</th><th>快捷操作</th></tr>
+        </thead>
+        <tbody id="tb_vips"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="grid-3">
     <div class="panel" style="margin-bottom:0;">
-      <h2><span>1. 访客来源渠道分布</span><button class="btn-refresh" onclick="loadStats()">刷新数据</button></h2>
+      <h2><span>1. 访客来源渠道分布</span></h2>
       <table>
         <thead><tr><th>来源渠道</th><th>访问量</th><th>占比</th></tr></thead>
         <tbody id="tb_channels"></tbody>
@@ -152,11 +233,11 @@
   </div>
 
   <div class="panel">
-    <h2><span>最近 30 幅实时生成的书法作品记录</span><a href="index.html" style="font-size:13px;color:var(--cinnabar);">← 返回书法创作主页</a></h2>
+    <h2><span>最近 30 幅实时生成的书法作品记录（区分 [免费古籍] 与 [VIP自定义]）</span><a href="index.html" style="font-size:13px;color:var(--cinnabar);">← 返回书法创作主页</a></h2>
     <div style="overflow-x:auto;">
       <table>
         <thead>
-          <tr><th>生成时间 (北京)</th><th>访客地区</th><th>访客 IP</th><th>题名</th><th>作者/落款</th><th>单页字数</th><th>字体与范式</th></tr>
+          <tr><th>生成时间 (北京)</th><th>访客地区</th><th>访客 IP</th><th>模式与题名</th><th>作者/落款</th><th>单页字数</th><th>字体与范式</th></tr>
         </thead>
         <tbody id="tb_renders"></tbody>
       </table>
@@ -178,6 +259,51 @@
 
 <script>
   const API_BASE = 'https://ai.top915.top/shufa-api';
+  const SITE_BASE = 'https://dvbs2000.github.io/liuchunlin-shufa/';
+
+  function buildWechatReply(code, uses) {
+    return `🎉 您的【刘春霖 AI 小楷书房】VIP 自定义创作权限已开通！\n\n🔑 专属通行码：${code}（可生成 ${uses} 幅自定义诗词/专属落款作品）\n\n👉 微信直接点击下方专属链接即可自动激活（免手动输入）：\n${SITE_BASE}?vip=${code}`;
+  }
+
+  function copyReplyText(code, uses) {
+    const msg = buildWechatReply(code, uses);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).then(() => {
+        alert('✅ 已复制微信发卡话术（含免输自动激活链接）！\n直接去微信粘贴发送给客户即可：\n\n' + msg);
+      });
+    } else {
+      prompt('请复制以下发卡话术发送给微信客户：', msg);
+    }
+  }
+
+  async function createVipCode() {
+    const admin_key = document.getElementById('admKey').value.trim();
+    const note = document.getElementById('vipNote').value.trim() || '微信VIP客户';
+    const uses = parseInt(document.getElementById('vipUses').value, 10) || 50;
+    const custom_code = document.getElementById('vipCustomCode').value.trim();
+    try {
+      const resp = await fetch(`${API_BASE}/api/vip/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ admin_key, note, uses, custom_code })
+      });
+      if (!resp.ok) {
+        alert('生成失败，请检查管理员密钥是否正确！');
+        return;
+      }
+      const d = await resp.json();
+      const msg = buildWechatReply(d.code, d.uses);
+      const box = document.getElementById('vipResultBox');
+      box.style.display = 'block';
+      box.innerHTML = `<strong>✅ 已成功生成 VIP 通行码：【${d.code}】</strong>（备注：${d.note}，共 ${d.uses} 幅）<br/>已自动为您复制微信回复话术，直接切回微信粘贴发给客户即可：<br/><pre style="margin-top:6px;white-space:pre-wrap;color:#ffd984;">${msg}</pre>`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).catch(() => {});
+      }
+      loadStats();
+    } catch (e) {
+      alert('请求失败，请检查网络。');
+    }
+  }
 
   function renderDistTable(tbodyId, rows) {
     const tb = document.getElementById(tbodyId);
@@ -211,13 +337,25 @@
       renderDistTable('tb_regions', d.regions);
       renderDistTable('tb_devices', d.devices);
 
+      const tbVip = document.getElementById('tb_vips');
+      tbVip.innerHTML = (d.vip_codes || []).map(v => `
+        <tr>
+          <td><strong style="color:var(--cinnabar);font-size:14px;">${v.code}</strong></td>
+          <td>${v.note}</td>
+          <td><strong>${v.remaining_uses}</strong> 幅</td>
+          <td>${v.total_uses} 幅</td>
+          <td>${v.created_at}</td>
+          <td><button class="btn-refresh" onclick="copyReplyText('${v.code}', ${v.remaining_uses})">📋 复制微信发卡链接</button></td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" style="color:#888;">暂无 VIP 码</td></tr>';
+
       const tbR = document.getElementById('tb_renders');
       tbR.innerHTML = (d.recent_renders || []).map(r => `
         <tr>
           <td>${r.ts}</td>
           <td>${r.region}</td>
           <td><code>${r.ip}</code></td>
-          <td><strong>《${r.title}》</strong></td>
+          <td><strong>${r.title}</strong></td>
           <td>${r.author}</td>
           <td>${r.char_count} 字</td>
           <td><span class="tag">${r.edition} · ${r.style}</span></td>

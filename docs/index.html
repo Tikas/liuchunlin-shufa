@@ -28,7 +28,7 @@
     header {
       background: linear-gradient(180deg, #231f1c 0%, #2e2925 100%);
       color: #f4eee1;
-      padding: 24px 20px 20px;
+      padding: 22px 20px 18px;
       text-align: center;
       border-bottom: 3px solid var(--cinnabar);
       box-shadow: 0 4px 16px rgba(0,0,0,0.18);
@@ -41,14 +41,14 @@
       padding: 2px 9px;
       border-radius: 3px;
       border: 1px solid rgba(255,255,255,0.45);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       letter-spacing: 2px;
     }
     header h1 {
       font-size: 24px;
       font-weight: 600;
       letter-spacing: 3px;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     header p {
       font-size: 13.5px;
@@ -56,174 +56,317 @@
       max-width: 640px;
       margin: 0 auto;
     }
+    .wx-group-bar {
+      margin-top: 10px;
+      display: inline-block;
+      background: rgba(168, 34, 26, 0.28);
+      border: 1px solid rgba(232, 204, 156, 0.6);
+      color: #f6e7c8;
+      font-size: 13px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+    }
+    .wx-group-bar strong {
+      color: #ffd984;
+      font-weight: 600;
+      user-select: all;
+    }
     .container {
-      max-width: 1120px;
-      margin: 22px auto;
+      max-width: 1140px;
+      margin: 20px auto;
       padding: 0 16px;
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 440px 1fr;
       gap: 24px;
     }
-    @media (max-width: 860px) {
+    @media (max-width: 900px) {
       .container { grid-template-columns: 1fr; }
     }
     .panel {
       background: var(--card-paper);
       border: 1px solid var(--gold-border);
       border-radius: 8px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: 0 6px 20px rgba(45, 35, 22, 0.08);
     }
     .panel-title {
-      font-size: 17px;
+      font-size: 16.5px;
       font-weight: 600;
       color: var(--ink-dark);
-      border-left: 4px solid var(--cinnabar);
-      padding-left: 10px;
-      margin-bottom: 14px;
+      border-bottom: 1px solid #dfd3bd;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .quota-pill {
       font-size: 12px;
-      font-weight: 500;
-      background: var(--cinnabar-light);
-      color: var(--cinnabar);
-      border: 1px solid rgba(168, 34, 26, 0.3);
-      padding: 2px 9px;
+      font-weight: normal;
+      background: #efe4d2;
+      color: #7c5832;
+      padding: 3px 9px;
       border-radius: 12px;
+      border: 1px solid #d5c3a6;
     }
-    .preset-bar {
-      display: flex;
-      flex-wrap: wrap;
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
-    .preset-btn {
-      background: #ece3d0;
-      border: 1px solid #c4b293;
-      color: #3a322a;
-      font-size: 12.5px;
-      padding: 5px 10px;
-      border-radius: 4px;
+    .mode-tab {
+      text-align: center;
+      padding: 9px 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1.5px solid #cbb99b;
+      background: #efe6d5;
+      color: #5c5042;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .preset-btn:hover, .preset-btn.active {
+    .mode-tab.active {
+      background: var(--cinnabar);
+      color: #fff;
+      border-color: #821710;
+      box-shadow: 0 2px 8px rgba(168, 34, 26, 0.25);
+    }
+    .mode-tab.vip-tab.active {
+      background: linear-gradient(135deg, #2d251e 0%, #4a3a2a 100%);
+      color: #ffd984;
+      border-color: #c8a45c;
+    }
+    .search-box-wrap {
+      background: #fffdf9;
+      border: 1px solid #cfbda0;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 11px;
+      border: 1px solid #cbb99b;
+      border-radius: 5px;
+      font-size: 13.5px;
+      background: #fff;
+    }
+    .cat-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 8px 0;
+    }
+    .cat-pill {
+      font-size: 11.5px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #efe6d5;
+      color: #5c5042;
+      border: 1px solid #d5c5ab;
+      cursor: pointer;
+    }
+    .cat-pill.active {
       background: var(--cinnabar);
       color: #fff;
       border-color: var(--cinnabar);
     }
-    label.field-label {
-      display: block;
+    .poem-list {
+      max-height: 162px;
+      overflow-y: auto;
+      border-top: 1px dashed #e2d5c1;
+      padding-top: 6px;
+    }
+    .poem-item {
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 12.8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f2eadc;
+    }
+    .poem-item:hover, .poem-item.selected {
+      background: var(--cinnabar-light);
+      color: var(--cinnabar);
+    }
+    .poem-item-title { font-weight: 600; }
+    .poem-item-preview {
+      color: #847768;
+      font-size: 11.5px;
+      max-width: 210px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vip-card {
+      background: linear-gradient(135deg, #2b241d 0%, #3d3126 100%);
+      color: #f7ebd2;
+      border: 1.5px solid #d4af6a;
+      border-radius: 7px;
+      padding: 13px;
+      margin-bottom: 12px;
+    }
+    .vip-card h3 {
+      color: #ffd984;
+      font-size: 14.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .vip-step {
+      font-size: 12.5px;
+      color: #e6d8be;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .copy-wx-btn {
+      display: inline-block;
+      background: #d4af6a;
+      color: #231c15;
+      font-weight: 700;
+      font-size: 12.5px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .vip-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .vip-input-row input {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 4px;
+      border: 1px solid #c8a45c;
+      background: #fffdf8;
+      font-size: 13px;
+      color: #222;
+      text-transform: uppercase;
+    }
+    .vip-unlock-btn {
+      background: var(--cinnabar);
+      color: #fff;
+      border: 1px solid #f3c68f;
+      padding: 7px 13px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 13px;
       color: var(--ink-muted);
       margin-bottom: 5px;
-      font-weight: 500;
+      margin-top: 8px;
     }
-    textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      height: 150px;
-      padding: 12px;
-      border: 1px solid #c5b496;
+      background: #fffdf9;
+      border: 1px solid #cbb99b;
       border-radius: 6px;
-      background: #fcfaf4;
+      padding: 9px 11px;
+      font-size: 14px;
       color: var(--ink-dark);
-      font-size: 15px;
-      line-height: 1.65;
-      resize: vertical;
       font-family: inherit;
     }
-    textarea:focus, input:focus {
-      outline: none;
-      border-color: var(--cinnabar);
+    textarea {
+      height: 130px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+    textarea[readonly] {
+      background: #f4ede0;
+      color: #4a4035;
+      cursor: pointer;
     }
     .smart-banner {
-      margin-top: 10px;
-      margin-bottom: 14px;
-      padding: 10px 12px;
-      background: #f2ead9;
-      border: 1px dashed #bfa882;
-      border-radius: 6px;
-      font-size: 12.5px;
-      color: #4a3f33;
+      margin-top: 8px;
+      background: #f2eadb;
+      border-left: 3px solid var(--cinnabar);
+      padding: 7px 10px;
+      font-size: 12px;
+      color: #4e4338;
+      border-radius: 0 4px 4px 0;
     }
-    .smart-banner strong { color: var(--cinnabar); }
     .row-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 12px;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #c5b496;
-      border-radius: 5px;
-      background: #fcfaf4;
-      font-size: 14px;
-      color: var(--ink-dark);
+      margin-top: 4px;
     }
     .radio-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-top: 4px;
     }
     .radio-card {
-      border: 1px solid #c5b496;
-      background: #fcfaf4;
-      border-radius: 5px;
-      padding: 8px 10px;
+      flex: 1;
       text-align: center;
-      font-size: 13.5px;
+      padding: 7px 6px;
+      border: 1px solid #cbb99b;
+      border-radius: 5px;
+      background: #fffdf9;
+      font-size: 13px;
       cursor: pointer;
-      user-select: none;
-      transition: all 0.15s;
     }
     .radio-card.selected {
-      background: var(--cinnabar-light);
       border-color: var(--cinnabar);
+      background: var(--cinnabar-light);
       color: var(--cinnabar);
       font-weight: 600;
     }
     .submit-btn {
       width: 100%;
+      margin-top: 14px;
+      padding: 12px;
       background: var(--cinnabar);
       color: #fff;
       border: none;
       border-radius: 6px;
-      padding: 13px;
       font-size: 16px;
       font-weight: 600;
       letter-spacing: 2px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(168, 34, 26, 0.3);
-      transition: opacity 0.15s;
     }
-    .submit-btn:hover { opacity: 0.92; }
-    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .submit-btn:disabled {
+      background: #9e8f7c;
+      cursor: wait;
+    }
     .preview-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
     .artwork-frame {
-      width: 100%;
-      background: #24211e;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: inset 0 0 24px rgba(0,0,0,0.45);
-      text-align: center;
+      background: #e2d8c5;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #c2b092;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.12);
+      max-width: 100%;
     }
     .artwork-frame img {
       max-width: 100%;
       height: auto;
-      border-radius: 3px;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.45);
       display: block;
-      margin: 0 auto;
+      border-radius: 2px;
     }
     .action-bar {
       margin-top: 14px;
@@ -249,22 +392,6 @@
       color: var(--cinnabar);
       font-weight: 500;
     }
-    .wx-group-bar {
-      margin-top: 10px;
-      display: inline-block;
-      background: rgba(168, 34, 26, 0.25);
-      border: 1px solid rgba(232, 204, 156, 0.55);
-      color: #f6e7c8;
-      font-size: 13px;
-      padding: 4px 14px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
-    }
-    .wx-group-bar strong {
-      color: #ffd984;
-      font-weight: 600;
-      user-select: all;
-    }
   </style>
 </head>
 <body>
@@ -272,57 +399,89 @@
 <header>
   <div class="seal-badge">状元小楷 · 宣纸真迹神韵</div>
   <h1>刘春霖 AI 小楷书房</h1>
-  <p>输入任意诗词或座右铭，智能识别题名落款，一秒生成故宫装裱级小楷书法册页</p>
-  <div class="wx-group-bar">✨ 对 AI 生成书法作品有兴趣可联系微信 <strong>2480555</strong> 加群</div>
+  <p>免费检索生成 963 首传世唐诗宋词名篇 · VIP 尊享自定义诗词文稿与个人专属落款</p>
+  <div class="wx-group-bar" onclick="copyWxId()">✨ 对 AI 生成书法作品有兴趣可联系微信 <strong>2480555</strong> 加群 / 开通自定义创作（点击复制微信号）</div>
 </header>
 
 <div class="container">
-  <!-- 左侧：输入与智能章法控制面板 -->
+  <!-- 左侧：双模式（免费唐诗宋词曲库 vs 付费VIP自定义）控制面板 -->
   <div class="panel">
     <div class="panel-title">
-      <span>题写诗词正文</span>
-      <span class="quota-pill" id="quotaBadge">每小时限免：10 幅 / IP</span>
+      <span>选择创作模式</span>
+      <span class="quota-pill" id="quotaBadge">古诗词免费：10 幅 / 小时</span>
     </div>
 
-    <label class="field-label">经典名篇一键体验：</label>
-    <div class="preset-bar">
-      <button type="button" class="preset-btn active" onclick="loadPreset('chunjiang_trad')">《春江花月夜》繁·乌丝栏</button>
-      <button type="button" class="preset-btn" onclick="loadPreset('chunjiang_simp')">《春江花月夜》简·素笺</button>
-      <button type="button" class="preset-btn" onclick="loadPreset('shanju_trad')">《山居秋暝》五言·乌丝栏</button>
-      <button type="button" class="preset-btn" onclick="loadPreset('xinjing_trad')">《心经》繁·乌丝栏</button>
-      <button type="button" class="preset-btn" onclick="loadPreset('lanting_simp')">《兰亭集序》简·素笺</button>
+    <!-- 模式切换双标签 -->
+    <div class="mode-tabs">
+      <div class="mode-tab active" id="tabFree" onclick="switchMode('free')">📚 传世唐诗宋词（免费）</div>
+      <div class="mode-tab vip-tab" id="tabVip" onclick="switchMode('vip')">👑 自定义文字（VIP定制）</div>
     </div>
 
-    <label class="field-label" for="poemInput">粘贴或输入诗词/文章（支持第一行直接带《题名》和作者）：</label>
-    <textarea id="poemInput" oninput="onTextChange()">《春江花月夜》
+    <!-- 模式 A：免费传世唐诗宋词搜索点选区 -->
+    <div id="freeSearchArea" class="search-box-wrap">
+      <input type="text" id="poemSearchInput" class="search-input" placeholder="🔍 搜诗名、作者或名句（如：苏轼、李白、将进酒、明月几时有）" oninput="renderPoemList()" />
+      <div class="cat-bar">
+        <span class="cat-pill active" onclick="setCat('', this)">全部名篇 (963)</span>
+        <span class="cat-pill" onclick="setCat('唐诗', this)">唐诗三百首</span>
+        <span class="cat-pill" onclick="setCat('宋词', this)">宋词三百首</span>
+        <span class="cat-pill" onclick="setCat('古文名篇', this)">古文名篇</span>
+        <span class="cat-pill" onclick="setCat('经文国学', this)">心经/道德经</span>
+        <span class="cat-pill" onclick="setCat('诗经楚辞', this)">诗经</span>
+      </div>
+      <div class="poem-list" id="poemListContainer">
+        <div style="padding:8px;color:#888;font-size:12px;">正在加载传世诗词典藏库...</div>
+      </div>
+    </div>
+
+    <!-- 模式 B：VIP 专属通行码解锁与极速加微信引导卡 -->
+    <div id="vipUnlockArea" class="vip-card" style="display:none;">
+      <h3>
+        <span>👑 VIP 尊享自定义文字与专属落款</span>
+        <span id="vipStatusBadge" style="font-size:11.5px;background:#5a4632;padding:2px 8px;border-radius:10px;color:#ffd984;">未解锁</span>
+      </h3>
+      <div id="vipGuideSteps">
+        <div class="vip-step">
+          <strong>如何轻松开通？</strong><br/>
+          ① 点击下方按钮复制微信号 <strong>2480555</strong> 添加站长好友；<br/>
+          ② 微信付款后即刻获取您的专属 <strong>VIP 通行码</strong>（或直接点击站长发您的免输激活链接）即可随意输入合法自定义诗词、祝寿词、座右铭及个人落款！
+          <div><button type="button" class="copy-wx-btn" onclick="copyWxId()">📋 一键复制微信号：2480555（去微信添加）</button></div>
+        </div>
+        <div class="vip-input-row">
+          <input type="text" id="vipCodeInput" placeholder="输入 VIP 通行码（如 VIP8899）" />
+          <button type="button" class="vip-unlock-btn" onclick="verifyVipCode(true)">立即解锁</button>
+        </div>
+      </div>
+      <div id="vipUnlockedBanner" style="display:none;font-size:12.5px;color:#a8f0c6;margin-top:4px;">
+        ✅ <strong>VIP 通行码已激活！</strong>您现在可以在下方自由输入任何合法诗词、祝寿赠言、座右铭，并自定义题名与个人落款（支持简体打字自动转繁体书法）。
+        <a href="javascript:void(0)" onclick="changeVipCode()" style="color:#ffd984;margin-left:8px;text-decoration:underline;">更换通行码</a>
+      </div>
+    </div>
+
+    <div class="field-label">
+      <span id="textareaLabel">当前选中诗词正文（免费模式已锁定古籍原文）：</span>
+      <span id="unlockHintLink" style="color:var(--cinnabar);cursor:pointer;font-weight:600;" onclick="switchMode('vip')">✍️ 想写自己的文字？点此切换 VIP 自定义</span>
+    </div>
+    <textarea id="poemInput" readonly onclick="handleTextareaClick()" oninput="onTextChange()">《春江花月夜》
 【唐】張若虛
-春江潮水連海平，海上明月共潮生。
-灩灩隨波千萬里，何處春江無月明。
-江流宛轉繞芳甸，月照花林皆似霰。
-空裏流霜不覺飛，汀上白沙看不見。
-江天一色無纖塵，皎皎空中孤月輪。
-江畔何人初見月，江月何年初照人。
-人生代代無窮已，江月年年望相似。
-不知江月待何人，但見長江送流水。
-白雲一片去悠悠，青楓浦上不勝愁。</textarea>
+春江潮水連海平，海上明月共潮生。灩灩隨波千萬里，何處春江無月明。江流宛轉繞芳甸，月照花林皆似霰。空裏流霜不覺飛，汀上白沙看不見。江天一色無纖塵，皎皎空中孤月輪。江畔何人初見月，江月何年初照人。人生代代無窮已，江月年年望相似。不知江月待何人，但見長江送流水。白雲一片去悠悠，青楓浦上不勝愁。</textarea>
 
     <div class="smart-banner" id="smartBanner">
-      <strong>智能章法识别：</strong>已识别题名「<span id="detTitle">春江花月夜</span>」、作者「<span id="detAuthor">張若虛</span>」<br/>
-      <span id="detLayout">体裁：七言古近体诗 → 自动排入 10列×14行 正方形册页（右侧第1列独立低起题名+作者落款钤印，正文每列恰好一联14字）</span>
+      <strong>智能章法识别：</strong>题名「<span id="detTitle">春江花月夜</span>」、作者/落款「<span id="detAuthor">張若虛</span>」<br/>
+      <span id="detLayout">体裁：七言古近体诗 → 自动排入 10列×14行 正方形册页</span>
     </div>
 
-    <div class="row-2col">
+    <div class="row-2col" id="customMetaRow">
       <div>
-        <label class="field-label" for="titleInput">题名（自动识别或手填）：</label>
-        <input type="text" id="titleInput" placeholder="如：春江花月夜（可留空）" oninput="updateSmartBanner()" />
+        <label class="field-label" for="titleInput">题名：</label>
+        <input type="text" id="titleInput" readonly placeholder="自动识别或VIP手填" oninput="updateSmartBanner()" />
       </div>
       <div>
-        <label class="field-label" for="authorInput">作者/落款：</label>
-        <input type="text" id="authorInput" placeholder="如：张若虚 / 春霖敬书" oninput="updateSmartBanner()" />
+        <label class="field-label" for="authorInput">作者 / 专属落款：</label>
+        <input type="text" id="authorInput" readonly placeholder="如：张若虚 / 某某敬书" oninput="updateSmartBanner()" />
       </div>
     </div>
 
-    <label class="field-label">字体选择：</label>
+    <label class="field-label">字体选择（切换繁简会自动转换古诗文字）：</label>
     <div class="radio-group">
       <div class="radio-card selected" id="ed_trad" onclick="setEdition('trad')">繁体馆阁体（正统旧字形）</div>
       <div class="radio-card" id="ed_simp" onclick="setEdition('simp')">简体馆阁体（现代通用）</div>
@@ -355,27 +514,27 @@
 </div>
 
 <!-- 底部：经典作品馆与真迹复刻对比展示 -->
-<div style="max-width: 1120px; margin: 12px auto 32px; padding: 0 16px;">
+<div style="max-width: 1140px; margin: 12px auto 32px; padding: 0 16px;">
   <div class="panel">
     <div class="panel-title">
       <span>刘春霖 AI 小楷书房 · 经典名篇与真迹对比鉴赏馆（点击图片可放大查看高清原图）</span>
-      <span class="quota-pill">对 AI 生成书法作品有兴趣可联系微信 2480555 加群</span>
+      <span class="quota-pill" style="cursor:pointer;" onclick="copyWxId()">对 AI 生成书法作品有兴趣可联系微信 2480555 加群</span>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-top: 8px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 8px;">
       <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
-        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">1. 《长恨歌》宣纸真迹 vs AI 小楷复刻对比</div>
+        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #3a322a;">1. 《长恨歌》宣纸真迹 vs AI 小楷复刻对比</div>
         <a href="gallery/showcase_changhenge.jpg" target="_blank"><img src="gallery/showcase_changhenge.jpg" alt="长恨歌真迹对比" style="width: 100%; border-radius: 4px; display: block;" /></a>
       </div>
       <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
-        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">2. 《春江花月夜》繁简双绝 · 零训练盲测展示</div>
+        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #3a322a;">2. 《春江花月夜》繁简双绝 · 零训练盲测展示</div>
         <a href="gallery/showcase_chunjiang_blindtest.jpg" target="_blank"><img src="gallery/showcase_chunjiang_blindtest.jpg" alt="春江花月夜展示" style="width: 100%; border-radius: 4px; display: block;" /></a>
       </div>
       <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
-        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">3. 《心经》乌丝栏 &《兰亭集序》无格素笺双范式</div>
+        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #3a322a;">3. 《心经》乌丝栏 &《兰亭集序》无格素笺双范式</div>
         <a href="gallery/showcase_copybook_sim.jpg" target="_blank"><img src="gallery/showcase_copybook_sim.jpg" alt="心经与兰亭集序展示" style="width: 100%; border-radius: 4px; display: block;" /></a>
       </div>
       <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
-        <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #3a322a;">4. 微信朋友圈裂变装裱设计（朱砂印章二维码）</div>
+        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; color: #3a322a;">4. 微信朋友圈裂变装裱设计（朱砂印章二维码）</div>
         <a href="gallery/showcase_qr_seal_demo.jpg" target="_blank"><img src="gallery/showcase_qr_seal_demo.jpg" alt="朱砂二维码印章设计" style="width: 100%; border-radius: 4px; display: block;" /></a>
       </div>
     </div>
@@ -383,41 +542,207 @@
 </div>
 
 <script>
+  const DEFAULT_API_BASE = 'https://ai.top915.top/shufa-api';
+  let currentMode = 'free'; // 'free' or 'vip'
   let currentEdition = 'trad';
   let currentStyle = 'zhalan';
+  let currentCat = '';
+  let anthology = [];
+  let selectedPoem = null;
+  let activeVipCode = localStorage.getItem('liuchunlin_vip_code') || '';
+  let vipRemaining = 0;
 
-  const PRESETS = {
-    chunjiang_trad: {
-      edition: 'trad',
-      style: 'zhalan',
-      gallery: 'gallery/chunjiang_trad.jpg',
-      text: `《春江花月夜》\n【唐】張若虛\n春江潮水連海平，海上明月共潮生。\n灩灩隨波千萬里，何處春江無月明。\n江流宛轉繞芳甸，月照花林皆似霰。\n空裏流霜不覺飛，汀上白沙看不見。\n江天一色無纖塵，皎皎空中孤月輪。\n江畔何人初見月，江月何年初照人。\n人生代代無窮已，江月年年望相似。\n不知江月待何人，但見長江送流水。\n白雲一片去悠悠，青楓浦上不勝愁。`
-    },
-    chunjiang_simp: {
-      edition: 'simp',
-      style: 'clean',
-      gallery: 'gallery/chunjiang_simp.jpg',
-      text: `《春江花月夜》\n【唐】张若虚\n春江潮水连海平，海上明月共潮生。\n滟滟随波千万里，何处春江无月明。\n江流宛转绕芳甸，月照花林皆似霰。\n空里流霜不觉飞，汀上白沙看不见。\n江天一色无纤尘，皎皎空中孤月轮。\n江畔何人初见月，江月何年初照人。\n人生代代无穷已，江月年年望相似。\n不知江月待何人，但见长江送流水。\n白云一片去悠悠，青枫浦上不胜愁。`
-    },
-    shanju_trad: {
-      edition: 'trad',
-      style: 'zhalan',
-      gallery: 'gallery/shanju_trad.jpg',
-      text: `《山居秋暝》\n【唐】王維\n空山新雨後，天氣晚來秋。\n明月松間照，清泉石上流。\n竹喧歸浣女，蓮動下漁舟。\n隨意春芳歇，王孫自可留。`
-    },
-    xinjing_trad: {
-      edition: 'trad',
-      style: 'zhalan',
-      gallery: 'gallery/xinjing_trad.jpg',
-      text: `般若波羅蜜多心經\n觀自在菩薩，行深般若波羅蜜多時，照見五蘊皆空，度一切苦厄。舍利子，色不異空，空不異色，色即是空，空即是色，受想行識，亦復如是。舍利子，是諸法空相，不生不滅，不垢不淨，不增不減。是故空中無色，無受想行識，無眼耳鼻舌身意，無色聲香味觸法，無眼界，乃至無意識界，無無明，亦無無明盡，乃至無老死，亦無老死盡。無苦集滅道，無智亦無得，以無所得故。`
-    },
-    lanting_simp: {
-      edition: 'simp',
-      style: 'clean',
-      gallery: 'gallery/lanting_simp.jpg',
-      text: `永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。群贤毕至，少长咸集。此地有崇山峻岭，茂林修竹，又有清流激湍，映带左右，引以为流觞曲水，列坐其次。虽无丝竹管弦之盛，一觞一咏，亦足以畅叙幽情。是日也，天朗气清，惠风和畅。仰观宇宙之大，俯察品类之盛，所以游目骋怀，足以极视听之娱，信可乐也。`
-    }
+  const GALLERY_PREVIEW_MAP = {
+    'p0001_trad': 'gallery/chunjiang_trad.jpg',
+    'p0001_simp': 'gallery/chunjiang_simp.jpg',
+    'p0002_trad': 'gallery/shanju_trad.jpg',
+    'p0003_trad': 'gallery/xinjing_trad.jpg',
+    'p0004_simp': 'gallery/lanting_simp.jpg'
   };
+
+  function getApiBase() {
+    return DEFAULT_API_BASE;
+  }
+
+  function copyWxId() {
+    const wx = '2480555';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(wx).then(() => {
+        alert('✅ 已复制站长微信号：2480555\n\n请打开微信「添加朋友」粘贴搜索，即可加群交流或秒开 VIP 自定义文字权限！');
+      }).catch(() => {
+        prompt('请长按复制微信号添加好友：', wx);
+      });
+    } else {
+      prompt('请长按复制微信号添加好友：', wx);
+    }
+  }
+
+  async function loadAnthology() {
+    try {
+      const r = await fetch('anthology.json');
+      anthology = await r.json();
+      if (anthology.length > 0) {
+        selectPoemById('p0001');
+      }
+      renderPoemList();
+    } catch (e) {
+      console.error('Failed to load anthology.json', e);
+    }
+  }
+
+  function setCat(cat, el) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    if (el) el.classList.add('active');
+    renderPoemList();
+  }
+
+  function renderPoemList() {
+    const q = (document.getElementById('poemSearchInput').value || '').trim().toLowerCase();
+    const box = document.getElementById('poemListContainer');
+    const matches = anthology.filter(item => {
+      if (currentCat && item.cat !== currentCat) return false;
+      if (!q) return true;
+      return item.t_simp.toLowerCase().includes(q) ||
+             item.t_trad.toLowerCase().includes(q) ||
+             item.a_simp.toLowerCase().includes(q) ||
+             item.a_trad.toLowerCase().includes(q) ||
+             item.c_simp.toLowerCase().includes(q) ||
+             item.c_trad.toLowerCase().includes(q);
+    }).slice(0, 60);
+
+    if (!matches.length) {
+      box.innerHTML = `<div style="padding:10px;color:#a8221a;font-size:12.5px;">未在古籍库中搜到「${q}」—— <a href="javascript:void(0)" onclick="switchMode('vip')" style="color:#a8221a;font-weight:700;text-decoration:underline;">点此切换【VIP自定义模式】自由输入任何诗词文字！</a></div>`;
+      return;
+    }
+
+    box.innerHTML = matches.map(item => {
+      const title = currentEdition === 'trad' ? item.t_trad : item.t_simp;
+      const author = currentEdition === 'trad' ? item.a_trad : item.a_simp;
+      const preview = currentEdition === 'trad' ? item.c_trad : item.c_simp;
+      const isSel = selectedPoem && selectedPoem.id === item.id;
+      return `
+        <div class="poem-item ${isSel ? 'selected' : ''}" onclick="selectPoemById('${item.id}')">
+          <span class="poem-item-title">《${title}》· ${author}</span>
+          <span class="poem-item-preview">${preview.slice(0, 18)}...</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function selectPoemById(pid) {
+    const item = anthology.find(x => x.id === pid);
+    if (!item) return;
+    selectedPoem = item;
+    applySelectedPoemToFields();
+    renderPoemList();
+    const gKey = `${item.id}_${currentEdition}`;
+    if (GALLERY_PREVIEW_MAP[gKey]) {
+      document.getElementById('resultImg').src = GALLERY_PREVIEW_MAP[gKey];
+      document.getElementById('downloadLink').href = GALLERY_PREVIEW_MAP[gKey];
+    }
+  }
+
+  function applySelectedPoemToFields() {
+    if (!selectedPoem || currentMode !== 'free') return;
+    const isTrad = currentEdition === 'trad';
+    const t = isTrad ? selectedPoem.t_trad : selectedPoem.t_simp;
+    const a = isTrad ? selectedPoem.a_trad : selectedPoem.a_simp;
+    const c = isTrad ? selectedPoem.c_trad : selectedPoem.c_simp;
+    document.getElementById('titleInput').value = t;
+    document.getElementById('authorInput').value = a;
+    document.getElementById('poemInput').value = `《${t}》\n${a}\n${c}`;
+    updateSmartBanner();
+  }
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById('tabFree').classList.toggle('active', mode === 'free');
+    document.getElementById('tabVip').classList.toggle('active', mode === 'vip');
+    document.getElementById('freeSearchArea').style.display = mode === 'free' ? 'block' : 'none';
+    document.getElementById('vipUnlockArea').style.display = mode === 'vip' ? 'block' : 'none';
+
+    const ta = document.getElementById('poemInput');
+    const ti = document.getElementById('titleInput');
+    const ai = document.getElementById('authorInput');
+    const label = document.getElementById('textareaLabel');
+    const hint = document.getElementById('unlockHintLink');
+
+    if (mode === 'free') {
+      ta.setAttribute('readonly', 'readonly');
+      ti.setAttribute('readonly', 'readonly');
+      ai.setAttribute('readonly', 'readonly');
+      label.textContent = '当前选中诗词正文（免费模式已锁定古籍原文）：';
+      hint.style.display = 'inline';
+      applySelectedPoemToFields();
+    } else {
+      hint.style.display = 'none';
+      if (activeVipCode && vipRemaining > 0) {
+        ta.removeAttribute('readonly');
+        ti.removeAttribute('readonly');
+        ai.removeAttribute('readonly');
+        label.textContent = '✍️ 自由输入您的诗词、祝寿赠言或座右铭（支持简体打字自动转繁体）：';
+      } else {
+        ta.setAttribute('readonly', 'readonly');
+        ti.setAttribute('readonly', 'readonly');
+        ai.setAttribute('readonly', 'readonly');
+        label.textContent = '🔒 请先在上方输入 VIP 通行码解锁自定义文字输入：';
+      }
+    }
+    updateSmartBanner();
+  }
+
+  function handleTextareaClick() {
+    if (currentMode === 'free') {
+      if (confirm('免费模式仅支持从上方《传世唐诗宋词库》（963首）中搜索点选生成。\n\n是否切换到【VIP 自定义文字模式】题写您自己的诗词或专属落款？')) {
+        switchMode('vip');
+      }
+    } else if (!activeVipCode || vipRemaining <= 0) {
+      document.getElementById('vipCodeInput').focus();
+    }
+  }
+
+  async function verifyVipCode(showAlert) {
+    const inputEl = document.getElementById('vipCodeInput');
+    const code = (inputEl.value || activeVipCode || '').trim().toUpperCase();
+    if (!code) {
+      if (showAlert) alert('请先输入 VIP 创作通行码（添加微信 2480555 获取）！');
+      return false;
+    }
+    try {
+      const r = await fetch(`${getApiBase()}/api/vip/verify?code=${encodeURIComponent(code)}`);
+      const d = await r.json();
+      if (d.valid && d.remaining > 0) {
+        activeVipCode = code;
+        vipRemaining = d.remaining;
+        localStorage.setItem('liuchunlin_vip_code', code);
+        inputEl.value = code;
+        document.getElementById('vipStatusBadge').textContent = `已激活 · 剩余 ${d.remaining} 幅`;
+        document.getElementById('vipStatusBadge').style.background = '#1e5631';
+        document.getElementById('vipGuideSteps').style.display = 'none';
+        document.getElementById('vipUnlockedBanner').style.display = 'block';
+        document.getElementById('quotaBadge').textContent = `👑 VIP 剩余：${d.remaining} 幅`;
+        if (currentMode === 'vip') switchMode('vip');
+        if (showAlert) alert(`🎉 VIP 创作通行码激活成功！\n剩余可用次数：${d.remaining} 幅。\n现在您可以自由输入文字并定制专属落款了！`);
+        return true;
+      } else {
+        localStorage.removeItem('liuchunlin_vip_code');
+        activeVipCode = '';
+        vipRemaining = 0;
+        if (showAlert) alert('该 VIP 通行码无效或次数已用完，请添加站长微信 2480555 开通或续期！');
+        return false;
+      }
+    } catch (e) {
+      if (showAlert) alert('验证服务器连接失败，请稍后重试。');
+      return false;
+    }
+  }
+
+  function changeVipCode() {
+    document.getElementById('vipGuideSteps').style.display = 'block';
+    document.getElementById('vipUnlockedBanner').style.display = 'none';
+    document.getElementById('vipCodeInput').focus();
+  }
 
   function cleanDynasty(s) {
     return s.replace(/^[\[【（(][^\]】）)]{1,4}[\]】）)]\s*/, '')
@@ -430,46 +755,19 @@
     let title = (expTitle || '').trim().replace(/^[《「『]|[》」』]$/g, '');
     let author = (expAuthor || '').trim();
     let lines = rawText.trim().split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-    if (!lines.length) return { title, author, body: '', rows: 14 };
+    if (!lines.length) return { title, author, body: '', rows: 14, genre: '' };
 
-    if (!title && lines.length >= 2) {
-      const l0 = lines[0];
-      const mBook = l0.match(/^[《「『]([^》」』]{1,12})[》」』]\s*(.*)$/);
-      if (mBook) {
-        title = mBook[1].trim();
-        const rem = cleanDynasty(mBook[2]);
-        if (rem && rem.length <= 5) {
-          author = author || rem;
-          lines = lines.slice(1);
-        } else {
-          lines = lines.slice(1);
-          if (lines.length >= 2) {
-            const candA = cleanDynasty(lines[0]);
-            if (candA.length >= 1 && candA.length <= 5 && !/[，。！？；：,.!?]/.test(lines[0])) {
-              author = author || candA;
-              lines = lines.slice(1);
-            }
-          }
-        }
-      } else {
-        const parts = l0.split(/\s+/);
-        if (parts.length === 2 && parts[0].length <= 8 && cleanDynasty(parts[1]).length <= 5 && !/[，。！？；：,.!?]/.test(l0)) {
-          title = parts[0];
-          author = author || cleanDynasty(parts[1]);
-          lines = lines.slice(1);
-        } else if (l0.length <= 8 && !/[，。！？；：,.!?]/.test(l0) && lines[1].length > l0.length && !l0.includes('心經') && !l0.includes('心经')) {
-          title = l0;
-          lines = lines.slice(1);
-          if (lines.length >= 2) {
-            const candA = cleanDynasty(lines[0]);
-            if (candA.length >= 1 && candA.length <= 5 && !/[，。！？；：,.!?]/.test(lines[0])) {
-              author = author || candA;
-              lines = lines.slice(1);
-            }
-          }
-        }
+    // Remove leading 《Title》 and Author lines from body if present
+    const mBook = lines[0].match(/^[《「『]([^》」』]{1,14})[》」』]\s*(.*)$/);
+    if (mBook) {
+      if (!title) title = mBook[1].trim();
+      lines = lines.slice(1);
+      if (lines.length >= 2 && lines[0].length <= 8 && !/[，。！？；：,.!?]/.test(lines[0])) {
+        if (!author) author = cleanDynasty(lines[0]);
+        lines = lines.slice(1);
       }
     }
+
     const body = lines.join('');
     const clauses = body.split(/[，。！？；：、,.!?;:\n]+/).map(s => s.replace(/\s+/g, '')).filter(Boolean);
     let rows = title ? 14 : (currentStyle === 'zhalan' ? 15 : 13);
@@ -480,10 +778,10 @@
       const c5 = lens.filter(l => l === 5).length;
       if (c7 >= lens.length * 0.75) {
         rows = 14;
-        genre = '七言古近体诗 → 自动排入 10列×14行 正方形册页（首列独立低起题款，正文每列恰好一联14字）';
+        genre = '七言诗 → 10列×14行（首列独立题款，每列一联14字）';
       } else if (c5 >= lens.length * 0.75) {
         rows = 15;
-        genre = '五言古近体诗 → 自动排入 10列×15行 正方形册页（首列独立低起题款，正文每列恰好三句15字）';
+        genre = '五言诗 → 10列×15行（首列独立题款，每列三句15字）';
       }
     }
     const cleanChars = Array.from(body).filter(c => !/\s/.test(c) && !'，。、；：？！“”‘’（）《》「」『』—…'.includes(c));
@@ -491,7 +789,7 @@
     const reservedTail = title ? 0 : 6;
     const maxPageChars = (availCols - 1) * rows + Math.max(2, rows - reservedTail);
     const pageHint = cleanChars.length > maxPageChars
-      ? ` ｜ ⚠️ 当前正文 ${cleanChars.length} 字超出单页上限（${maxPageChars} 字），将自动仅排版第一页`
+      ? ` ｜ ⚠️ 正文 ${cleanChars.length} 字超出单页上限（${maxPageChars} 字），将自动仅排版第一页`
       : ` ｜ 单页容量：${cleanChars.length} / ${maxPageChars} 字`;
     return { title, author, body, rows, genre: genre + pageHint, maxPageChars };
   }
@@ -507,7 +805,6 @@
   }
 
   function onTextChange() {
-    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
     updateSmartBanner();
   }
 
@@ -515,7 +812,12 @@
     currentEdition = ed;
     document.getElementById('ed_trad').classList.toggle('selected', ed === 'trad');
     document.getElementById('ed_simp').classList.toggle('selected', ed === 'simp');
-    updateSmartBanner();
+    if (currentMode === 'free') {
+      applySelectedPoemToFields();
+      renderPoemList();
+    } else {
+      updateSmartBanner();
+    }
   }
 
   function setStyle(st) {
@@ -525,54 +827,17 @@
     updateSmartBanner();
   }
 
-  function loadPreset(key) {
-    const p = PRESETS[key];
-    if (!p) return;
-    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById('poemInput').value = p.text;
-    document.getElementById('titleInput').value = '';
-    document.getElementById('authorInput').value = '';
-    setEdition(p.edition);
-    setStyle(p.style);
-    const imgEl = document.getElementById('resultImg');
-    imgEl.src = p.gallery;
-    document.getElementById('downloadLink').href = p.gallery;
-  }
-
-  const DEFAULT_API_BASE = 'https://ai.top915.top/shufa-api';
-
-  function getApiBase() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('api')) {
-      localStorage.setItem('liuchunlin_api_base', params.get('api'));
-      return params.get('api').replace(/\/+$/, '');
-    }
-    return (localStorage.getItem('liuchunlin_api_base') || DEFAULT_API_BASE).replace(/\/+$/, '');
-  }
-
-  function saveApiUrl() {
-    const v = document.getElementById('apiUrlInput').value.trim().replace(/\/+$/, '');
-    if (v) {
-      localStorage.setItem('liuchunlin_api_base', v);
-    } else {
-      localStorage.removeItem('liuchunlin_api_base');
-    }
-    refreshQuota();
-  }
-
   async function refreshQuota() {
     const apiBase = getApiBase();
-    if (!apiBase) return;
     try {
       const params = new URLSearchParams(window.location.search);
       const ref = encodeURIComponent(document.referrer || '');
       const src = encodeURIComponent(params.get('src') || '');
       const r = await fetch(`${apiBase}/api/quota?ref=${ref}&src=${src}`);
-      if (r.ok) {
+      if (r.ok && (!activeVipCode || vipRemaining <= 0)) {
         const d = await r.json();
-        const lim = d.hourly_limit || d.daily_limit || 10;
-        document.getElementById('quotaBadge').textContent = `本小时剩余免费：${d.remaining} / ${lim} 幅`;
+        const lim = d.hourly_limit || 10;
+        document.getElementById('quotaBadge').textContent = `免费古诗剩余：${d.remaining} / ${lim} 幅`;
       }
     } catch (e) {}
   }
@@ -581,27 +846,32 @@
     const apiBase = getApiBase();
     const raw = document.getElementById('poemInput').value.trim();
     if (!raw) {
-      alert('请先输入要生成的诗词或文字内容！');
+      alert('请先选择或输入要生成的诗词内容！');
       return;
     }
-    if (!apiBase) {
-      alert('当前为 GitHub Pages 静态展示模式（可直接切换上方四大名篇预览并扫码测试）。\n\n如需动态生成新文字，请在页面左下角「Ubuntu 渲染主机接口设置」中填入您的 Ubuntu 服务器 HTTPS 接口地址！');
+    if (currentMode === 'vip' && (!activeVipCode || vipRemaining <= 0)) {
+      alert('自定义文字模式需要先输入 VIP 创作通行码！\n\n请添加站长微信 2480555 付费开通，或切换回【传世唐诗宋词（免费）】模式。');
+      document.getElementById('vipCodeInput').focus();
       return;
     }
+
     const btn = document.getElementById('renderBtn');
     btn.disabled = true;
     btn.textContent = '正在研墨挥毫生成中（约1~2秒）...';
     try {
+      const payload = {
+        text: raw,
+        title: document.getElementById('titleInput').value.trim(),
+        author: document.getElementById('authorInput').value.trim(),
+        edition: currentEdition,
+        style: currentStyle,
+        poem_id: (currentMode === 'free' && selectedPoem) ? selectedPoem.id : '',
+        vip_code: (currentMode === 'vip') ? activeVipCode : ''
+      };
       const resp = await fetch(`${apiBase}/api/render`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: raw,
-          title: document.getElementById('titleInput').value.trim(),
-          author: document.getElementById('authorInput').value.trim(),
-          edition: currentEdition,
-          style: currentStyle
-        })
+        body: JSON.stringify(payload)
       });
       if (!resp.ok) {
         let msg = `生成失败 (${resp.status})`;
@@ -612,9 +882,14 @@
         alert(msg);
         return;
       }
-      const rem = resp.headers.get('X-Quota-Remaining');
-      if (rem !== null) {
-        document.getElementById('quotaBadge').textContent = `本小时剩余免费：${rem} / 10 幅`;
+      const vipRemHeader = resp.headers.get('X-VIP-Remaining');
+      const freeRemHeader = resp.headers.get('X-Quota-Remaining');
+      if (vipRemHeader !== null) {
+        vipRemaining = parseInt(vipRemHeader, 10);
+        document.getElementById('vipStatusBadge').textContent = `已激活 · 剩余 ${vipRemaining} 幅`;
+        document.getElementById('quotaBadge').textContent = `👑 VIP 剩余：${vipRemaining} 幅`;
+      } else if (freeRemHeader !== null) {
+        document.getElementById('quotaBadge').textContent = `免费古诗剩余：${freeRemHeader} / 10 幅`;
       }
       const blob = await resp.blob();
       const objUrl = URL.createObjectURL(blob);
@@ -623,16 +898,28 @@
       dl.href = objUrl;
       dl.download = '刘春霖小楷书法作品.jpg';
     } catch (err) {
-      alert('无法连接 Ubuntu 渲染主机，请检查主机服务或 Cloudflare Tunnel 是否已启动。');
+      alert('无法连接渲染服务器，请稍后重试。');
     } finally {
       btn.disabled = false;
       btn.textContent = '立即挥毫生成书法作品';
     }
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    updateSmartBanner();
+  window.addEventListener('DOMContentLoaded', async () => {
+    await loadAnthology();
     refreshQuota();
+
+    // Check if URL has ?vip=VIPXXXX magic auto-unlock link!
+    const params = new URLSearchParams(window.location.search);
+    const urlVip = params.get('vip');
+    if (urlVip) {
+      document.getElementById('vipCodeInput').value = urlVip.trim().toUpperCase();
+      switchMode('vip');
+      await verifyVipCode(true);
+    } else if (activeVipCode) {
+      document.getElementById('vipCodeInput').value = activeVipCode;
+      await verifyVipCode(false);
+    }
   });
 </script>
 </body>
