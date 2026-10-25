@@ -1,6 +1,6 @@
 # 刘春霖 AI 小楷书房 · 在线诗词书法生成系统
 
-> **✨ 对 AI 生成书法作品有兴趣可联系微信 `2480555` 加群**
+> **✨ 对 AI 生成书法作品有兴趣可联系微信 `2480555` 加群 ｜ 如需输入自定义文字请联系邮箱 `sdicfund@hotmail.com`**
 >
 > 🌐 **在线体验网站（GitHub Pages 点开即用）**：**[https://dvbs2000.github.io/liuchunlin-shufa/](https://dvbs2000.github.io/liuchunlin-shufa/)**
 

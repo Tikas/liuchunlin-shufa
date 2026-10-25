@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>刘春霖 AI 小楷书房 · 在线定制您的专属诗词书法册页</title>
+  <title>刘春霖 AI 小楷书房 · 在线检索唐诗宋词生成专属书法册页</title>
   <style>
     :root {
       --bg-paper: #efe8d8;
@@ -53,7 +53,7 @@
     header p {
       font-size: 13.5px;
       color: #cbbda6;
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
     }
     .wx-group-bar {
@@ -66,7 +66,6 @@
       padding: 4px 14px;
       border-radius: 20px;
       letter-spacing: 0.5px;
-      cursor: pointer;
     }
     .wx-group-bar strong {
       color: #ffd984;
@@ -113,35 +112,6 @@
       border-radius: 12px;
       border: 1px solid #d5c3a6;
     }
-    .mode-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .mode-tab {
-      text-align: center;
-      padding: 9px 8px;
-      font-size: 13.5px;
-      font-weight: 600;
-      border-radius: 6px;
-      border: 1.5px solid #cbb99b;
-      background: #efe6d5;
-      color: #5c5042;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .mode-tab.active {
-      background: var(--cinnabar);
-      color: #fff;
-      border-color: #821710;
-      box-shadow: 0 2px 8px rgba(168, 34, 26, 0.25);
-    }
-    .mode-tab.vip-tab.active {
-      background: linear-gradient(135deg, #2d251e 0%, #4a3a2a 100%);
-      color: #ffd984;
-      border-color: #c8a45c;
-    }
     .search-box-wrap {
       background: #fffdf9;
       border: 1px solid #cfbda0;
@@ -178,7 +148,7 @@
       border-color: var(--cinnabar);
     }
     .poem-list {
-      max-height: 162px;
+      max-height: 175px;
       overflow-y: auto;
       border-top: 1px dashed #e2d5c1;
       padding-top: 6px;
@@ -206,65 +176,21 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .vip-card {
-      background: linear-gradient(135deg, #2b241d 0%, #3d3126 100%);
-      color: #f7ebd2;
-      border: 1.5px solid #d4af6a;
-      border-radius: 7px;
-      padding: 13px;
-      margin-bottom: 12px;
-    }
-    .vip-card h3 {
-      color: #ffd984;
-      font-size: 14.5px;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .vip-step {
+    .custom-email-notice {
+      background: #f4ead8;
+      border: 1px solid #d5c2a3;
+      border-radius: 6px;
+      padding: 8px 11px;
+      margin-bottom: 10px;
       font-size: 12.5px;
-      color: #e6d8be;
-      margin-bottom: 8px;
+      color: #554738;
       line-height: 1.5;
     }
-    .copy-wx-btn {
-      display: inline-block;
-      background: #d4af6a;
-      color: #231c15;
-      font-weight: 700;
-      font-size: 12.5px;
-      padding: 5px 12px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-    .vip-input-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .vip-input-row input {
-      flex: 1;
-      padding: 7px 10px;
-      border-radius: 4px;
-      border: 1px solid #c8a45c;
-      background: #fffdf8;
-      font-size: 13px;
-      color: #222;
-      text-transform: uppercase;
-    }
-    .vip-unlock-btn {
-      background: var(--cinnabar);
-      color: #fff;
-      border: 1px solid #f3c68f;
-      padding: 7px 13px;
-      border-radius: 4px;
-      font-size: 13px;
+    .custom-email-notice a, .custom-email-notice strong {
+      color: var(--cinnabar);
       font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
+      user-select: all;
+      text-decoration: none;
     }
     .field-label {
       display: flex;
@@ -286,11 +212,11 @@
       font-family: inherit;
     }
     textarea {
-      height: 130px;
+      height: 125px;
       resize: vertical;
       line-height: 1.65;
     }
-    textarea[readonly] {
+    textarea[readonly], input[readonly] {
       background: #f4ede0;
       color: #4a4035;
       cursor: pointer;
@@ -399,27 +325,20 @@
 <header>
   <div class="seal-badge">状元小楷 · 宣纸真迹神韵</div>
   <h1>刘春霖 AI 小楷书房</h1>
-  <p>免费检索生成 963 首传世唐诗宋词名篇 · VIP 尊享自定义诗词文稿与个人专属落款</p>
-  <div class="wx-group-bar" onclick="copyWxId()">✨ 对 AI 生成书法作品有兴趣可联系微信 <strong>2480555</strong> 加群 / 开通自定义创作（点击复制微信号）</div>
+  <p>在线检索 963 首传世唐诗宋词名篇 · 一秒生成故宫装裱级小楷书法册页</p>
+  <div class="wx-group-bar">✨ 对 AI 生成书法作品有兴趣可联系微信 <strong>2480555</strong> 加群 ｜ 如需输入自定义文字请联系邮箱 <strong>sdicfund@hotmail.com</strong></div>
 </header>
 
 <div class="container">
-  <!-- 左侧：双模式（免费唐诗宋词曲库 vs 付费VIP自定义）控制面板 -->
+  <!-- 左侧：唐诗宋词检索与章法控制面板 -->
   <div class="panel">
     <div class="panel-title">
-      <span>选择创作模式</span>
-      <span class="quota-pill" id="quotaBadge">古诗词免费：10 幅 / 小时</span>
+      <span>检索传世唐诗宋词体验</span>
+      <span class="quota-pill" id="quotaBadge">每小时限免：10 幅 / IP</span>
     </div>
 
-    <!-- 模式切换双标签 -->
-    <div class="mode-tabs">
-      <div class="mode-tab active" id="tabFree" onclick="switchMode('free')">📚 传世唐诗宋词（免费）</div>
-      <div class="mode-tab vip-tab" id="tabVip" onclick="switchMode('vip')">👑 自定义文字（VIP定制）</div>
-    </div>
-
-    <!-- 模式 A：免费传世唐诗宋词搜索点选区 -->
-    <div id="freeSearchArea" class="search-box-wrap">
-      <input type="text" id="poemSearchInput" class="search-input" placeholder="🔍 搜诗名、作者或名句（如：苏轼、李白、将进酒、明月几时有）" oninput="renderPoemList()" />
+    <div class="search-box-wrap">
+      <input type="text" id="poemSearchInput" class="search-input" placeholder="🔍 搜索诗名、作者或任意诗句（如：苏轼、李白、将进酒、明月几时有）" oninput="renderPoemList()" />
       <div class="cat-bar">
         <span class="cat-pill active" onclick="setCat('', this)">全部名篇 (963)</span>
         <span class="cat-pill" onclick="setCat('唐诗', this)">唐诗三百首</span>
@@ -433,51 +352,30 @@
       </div>
     </div>
 
-    <!-- 模式 B：VIP 专属通行码解锁与极速加微信引导卡 -->
-    <div id="vipUnlockArea" class="vip-card" style="display:none;">
-      <h3>
-        <span>👑 VIP 尊享自定义文字与专属落款</span>
-        <span id="vipStatusBadge" style="font-size:11.5px;background:#5a4632;padding:2px 8px;border-radius:10px;color:#ffd984;">未解锁</span>
-      </h3>
-      <div id="vipGuideSteps">
-        <div class="vip-step">
-          <strong>如何轻松开通？</strong><br/>
-          ① 点击下方按钮复制微信号 <strong>2480555</strong> 添加站长好友；<br/>
-          ② 微信付款后即刻获取您的专属 <strong>VIP 通行码</strong>（或直接点击站长发您的免输激活链接）即可随意输入合法自定义诗词、祝寿词、座右铭及个人落款！
-          <div><button type="button" class="copy-wx-btn" onclick="copyWxId()">📋 一键复制微信号：2480555（去微信添加）</button></div>
-        </div>
-        <div class="vip-input-row">
-          <input type="text" id="vipCodeInput" placeholder="输入 VIP 通行码（如 VIP8899）" />
-          <button type="button" class="vip-unlock-btn" onclick="verifyVipCode(true)">立即解锁</button>
-        </div>
-      </div>
-      <div id="vipUnlockedBanner" style="display:none;font-size:12.5px;color:#a8f0c6;margin-top:4px;">
-        ✅ <strong>VIP 通行码已激活！</strong>您现在可以在下方自由输入任何合法诗词、祝寿赠言、座右铭，并自定义题名与个人落款（支持简体打字自动转繁体书法）。
-        <a href="javascript:void(0)" onclick="changeVipCode()" style="color:#ffd984;margin-left:8px;text-decoration:underline;">更换通行码</a>
-      </div>
+    <div class="custom-email-notice">
+      💡 当前仅开放搜索唐诗宋词名篇体验。<strong>如需输入自定义文字，请联系邮箱：<a href="mailto:sdicfund@hotmail.com">sdicfund@hotmail.com</a></strong>
     </div>
 
     <div class="field-label">
-      <span id="textareaLabel">当前选中诗词正文（免费模式已锁定古籍原文）：</span>
-      <span id="unlockHintLink" style="color:var(--cinnabar);cursor:pointer;font-weight:600;" onclick="switchMode('vip')">✍️ 想写自己的文字？点此切换 VIP 自定义</span>
+      <span>当前选中诗词正文（仅限上方搜索点选）：</span>
     </div>
-    <textarea id="poemInput" readonly onclick="handleTextareaClick()" oninput="onTextChange()">《春江花月夜》
+    <textarea id="poemInput" readonly onclick="handleLockedClick()">《春江花月夜》
 【唐】張若虛
 春江潮水連海平，海上明月共潮生。灩灩隨波千萬里，何處春江無月明。江流宛轉繞芳甸，月照花林皆似霰。空裏流霜不覺飛，汀上白沙看不見。江天一色無纖塵，皎皎空中孤月輪。江畔何人初見月，江月何年初照人。人生代代無窮已，江月年年望相似。不知江月待何人，但見長江送流水。白雲一片去悠悠，青楓浦上不勝愁。</textarea>
 
     <div class="smart-banner" id="smartBanner">
-      <strong>智能章法识别：</strong>题名「<span id="detTitle">春江花月夜</span>」、作者/落款「<span id="detAuthor">張若虛</span>」<br/>
+      <strong>智能章法识别：</strong>题名「<span id="detTitle">春江花月夜</span>」、作者「<span id="detAuthor">張若虛</span>」<br/>
       <span id="detLayout">体裁：七言古近体诗 → 自动排入 10列×14行 正方形册页</span>
     </div>
 
-    <div class="row-2col" id="customMetaRow">
+    <div class="row-2col">
       <div>
         <label class="field-label" for="titleInput">题名：</label>
-        <input type="text" id="titleInput" readonly placeholder="自动识别或VIP手填" oninput="updateSmartBanner()" />
+        <input type="text" id="titleInput" readonly onclick="handleLockedClick()" />
       </div>
       <div>
-        <label class="field-label" for="authorInput">作者 / 专属落款：</label>
-        <input type="text" id="authorInput" readonly placeholder="如：张若虚 / 某某敬书" oninput="updateSmartBanner()" />
+        <label class="field-label" for="authorInput">作者：</label>
+        <input type="text" id="authorInput" readonly onclick="handleLockedClick()" />
       </div>
     </div>
 
@@ -518,7 +416,7 @@
   <div class="panel">
     <div class="panel-title">
       <span>刘春霖 AI 小楷书房 · 经典名篇与真迹对比鉴赏馆（点击图片可放大查看高清原图）</span>
-      <span class="quota-pill" style="cursor:pointer;" onclick="copyWxId()">对 AI 生成书法作品有兴趣可联系微信 2480555 加群</span>
+      <span class="quota-pill">如需自定义文字请联系邮箱 sdicfund@hotmail.com</span>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 8px;">
       <div style="border: 1px solid #d5c7af; border-radius: 6px; padding: 10px; background: #fffdf8;">
@@ -543,14 +441,11 @@
 
 <script>
   const DEFAULT_API_BASE = 'https://ai.top915.top/shufa-api';
-  let currentMode = 'free'; // 'free' or 'vip'
   let currentEdition = 'trad';
   let currentStyle = 'zhalan';
   let currentCat = '';
   let anthology = [];
   let selectedPoem = null;
-  let activeVipCode = localStorage.getItem('liuchunlin_vip_code') || '';
-  let vipRemaining = 0;
 
   const GALLERY_PREVIEW_MAP = {
     'p0001_trad': 'gallery/chunjiang_trad.jpg',
@@ -564,17 +459,8 @@
     return DEFAULT_API_BASE;
   }
 
-  function copyWxId() {
-    const wx = '2480555';
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(wx).then(() => {
-        alert('✅ 已复制站长微信号：2480555\n\n请打开微信「添加朋友」粘贴搜索，即可加群交流或秒开 VIP 自定义文字权限！');
-      }).catch(() => {
-        prompt('请长按复制微信号添加好友：', wx);
-      });
-    } else {
-      prompt('请长按复制微信号添加好友：', wx);
-    }
+  function handleLockedClick() {
+    alert('当前仅开放搜索《传世唐诗宋词·古文经典库》（共963首）体验生成。\n\n如需输入自定义文字，请联系邮箱：sdicfund@hotmail.com');
   }
 
   async function loadAnthology() {
@@ -612,7 +498,7 @@
     }).slice(0, 60);
 
     if (!matches.length) {
-      box.innerHTML = `<div style="padding:10px;color:#a8221a;font-size:12.5px;">未在古籍库中搜到「${q}」—— <a href="javascript:void(0)" onclick="switchMode('vip')" style="color:#a8221a;font-weight:700;text-decoration:underline;">点此切换【VIP自定义模式】自由输入任何诗词文字！</a></div>`;
+      box.innerHTML = `<div style="padding:10px;color:#a8221a;font-size:12.5px;">未在古籍库中搜到「${q}」—— 如需输入自定义文字，请联系邮箱：<strong>sdicfund@hotmail.com</strong></div>`;
       return;
     }
 
@@ -644,7 +530,7 @@
   }
 
   function applySelectedPoemToFields() {
-    if (!selectedPoem || currentMode !== 'free') return;
+    if (!selectedPoem) return;
     const isTrad = currentEdition === 'trad';
     const t = isTrad ? selectedPoem.t_trad : selectedPoem.t_simp;
     const a = isTrad ? selectedPoem.a_trad : selectedPoem.a_simp;
@@ -655,115 +541,18 @@
     updateSmartBanner();
   }
 
-  function switchMode(mode) {
-    currentMode = mode;
-    document.getElementById('tabFree').classList.toggle('active', mode === 'free');
-    document.getElementById('tabVip').classList.toggle('active', mode === 'vip');
-    document.getElementById('freeSearchArea').style.display = mode === 'free' ? 'block' : 'none';
-    document.getElementById('vipUnlockArea').style.display = mode === 'vip' ? 'block' : 'none';
-
-    const ta = document.getElementById('poemInput');
-    const ti = document.getElementById('titleInput');
-    const ai = document.getElementById('authorInput');
-    const label = document.getElementById('textareaLabel');
-    const hint = document.getElementById('unlockHintLink');
-
-    if (mode === 'free') {
-      ta.setAttribute('readonly', 'readonly');
-      ti.setAttribute('readonly', 'readonly');
-      ai.setAttribute('readonly', 'readonly');
-      label.textContent = '当前选中诗词正文（免费模式已锁定古籍原文）：';
-      hint.style.display = 'inline';
-      applySelectedPoemToFields();
-    } else {
-      hint.style.display = 'none';
-      if (activeVipCode && vipRemaining > 0) {
-        ta.removeAttribute('readonly');
-        ti.removeAttribute('readonly');
-        ai.removeAttribute('readonly');
-        label.textContent = '✍️ 自由输入您的诗词、祝寿赠言或座右铭（支持简体打字自动转繁体）：';
-      } else {
-        ta.setAttribute('readonly', 'readonly');
-        ti.setAttribute('readonly', 'readonly');
-        ai.setAttribute('readonly', 'readonly');
-        label.textContent = '🔒 请先在上方输入 VIP 通行码解锁自定义文字输入：';
-      }
-    }
-    updateSmartBanner();
-  }
-
-  function handleTextareaClick() {
-    if (currentMode === 'free') {
-      if (confirm('免费模式仅支持从上方《传世唐诗宋词库》（963首）中搜索点选生成。\n\n是否切换到【VIP 自定义文字模式】题写您自己的诗词或专属落款？')) {
-        switchMode('vip');
-      }
-    } else if (!activeVipCode || vipRemaining <= 0) {
-      document.getElementById('vipCodeInput').focus();
-    }
-  }
-
-  async function verifyVipCode(showAlert) {
-    const inputEl = document.getElementById('vipCodeInput');
-    const code = (inputEl.value || activeVipCode || '').trim().toUpperCase();
-    if (!code) {
-      if (showAlert) alert('请先输入 VIP 创作通行码（添加微信 2480555 获取）！');
-      return false;
-    }
-    try {
-      const r = await fetch(`${getApiBase()}/api/vip/verify?code=${encodeURIComponent(code)}`);
-      const d = await r.json();
-      if (d.valid && d.remaining > 0) {
-        activeVipCode = code;
-        vipRemaining = d.remaining;
-        localStorage.setItem('liuchunlin_vip_code', code);
-        inputEl.value = code;
-        document.getElementById('vipStatusBadge').textContent = `已激活 · 剩余 ${d.remaining} 幅`;
-        document.getElementById('vipStatusBadge').style.background = '#1e5631';
-        document.getElementById('vipGuideSteps').style.display = 'none';
-        document.getElementById('vipUnlockedBanner').style.display = 'block';
-        document.getElementById('quotaBadge').textContent = `👑 VIP 剩余：${d.remaining} 幅`;
-        if (currentMode === 'vip') switchMode('vip');
-        if (showAlert) alert(`🎉 VIP 创作通行码激活成功！\n剩余可用次数：${d.remaining} 幅。\n现在您可以自由输入文字并定制专属落款了！`);
-        return true;
-      } else {
-        localStorage.removeItem('liuchunlin_vip_code');
-        activeVipCode = '';
-        vipRemaining = 0;
-        if (showAlert) alert('该 VIP 通行码无效或次数已用完，请添加站长微信 2480555 开通或续期！');
-        return false;
-      }
-    } catch (e) {
-      if (showAlert) alert('验证服务器连接失败，请稍后重试。');
-      return false;
-    }
-  }
-
-  function changeVipCode() {
-    document.getElementById('vipGuideSteps').style.display = 'block';
-    document.getElementById('vipUnlockedBanner').style.display = 'none';
-    document.getElementById('vipCodeInput').focus();
-  }
-
-  function cleanDynasty(s) {
-    return s.replace(/^[\[【（(][^\]】）)]{1,4}[\]】）)]\s*/, '')
-            .replace(/^(?:作者|撰人|书者)[:：]\s*/, '')
-            .replace(/^(?:唐|宋|元|明|清|汉|魏|晋|南北朝|隋|近代|现代)[·・\s]+/, '')
-            .trim();
-  }
-
   function smartParseInput(rawText, expTitle, expAuthor) {
     let title = (expTitle || '').trim().replace(/^[《「『]|[》」』]$/g, '');
     let author = (expAuthor || '').trim();
     let lines = rawText.trim().split(/\r?\n/).map(s => s.trim()).filter(Boolean);
     if (!lines.length) return { title, author, body: '', rows: 14, genre: '' };
 
-    // Remove leading 《Title》 and Author lines from body if present
     const mBook = lines[0].match(/^[《「『]([^》」』]{1,14})[》」』]\s*(.*)$/);
     if (mBook) {
       if (!title) title = mBook[1].trim();
       lines = lines.slice(1);
       if (lines.length >= 2 && lines[0].length <= 8 && !/[，。！？；：,.!?]/.test(lines[0])) {
-        if (!author) author = cleanDynasty(lines[0]);
+        if (!author) author = lines[0];
         lines = lines.slice(1);
       }
     }
@@ -804,20 +593,12 @@
     document.getElementById('detLayout').textContent = info.genre;
   }
 
-  function onTextChange() {
-    updateSmartBanner();
-  }
-
   function setEdition(ed) {
     currentEdition = ed;
     document.getElementById('ed_trad').classList.toggle('selected', ed === 'trad');
     document.getElementById('ed_simp').classList.toggle('selected', ed === 'simp');
-    if (currentMode === 'free') {
-      applySelectedPoemToFields();
-      renderPoemList();
-    } else {
-      updateSmartBanner();
-    }
+    applySelectedPoemToFields();
+    renderPoemList();
   }
 
   function setStyle(st) {
@@ -834,10 +615,10 @@
       const ref = encodeURIComponent(document.referrer || '');
       const src = encodeURIComponent(params.get('src') || '');
       const r = await fetch(`${apiBase}/api/quota?ref=${ref}&src=${src}`);
-      if (r.ok && (!activeVipCode || vipRemaining <= 0)) {
+      if (r.ok) {
         const d = await r.json();
         const lim = d.hourly_limit || 10;
-        document.getElementById('quotaBadge').textContent = `免费古诗剩余：${d.remaining} / ${lim} 幅`;
+        document.getElementById('quotaBadge').textContent = `本小时剩余免费：${d.remaining} / ${lim} 幅`;
       }
     } catch (e) {}
   }
@@ -845,13 +626,8 @@
   async function submitRender() {
     const apiBase = getApiBase();
     const raw = document.getElementById('poemInput').value.trim();
-    if (!raw) {
-      alert('请先选择或输入要生成的诗词内容！');
-      return;
-    }
-    if (currentMode === 'vip' && (!activeVipCode || vipRemaining <= 0)) {
-      alert('自定义文字模式需要先输入 VIP 创作通行码！\n\n请添加站长微信 2480555 付费开通，或切换回【传世唐诗宋词（免费）】模式。');
-      document.getElementById('vipCodeInput').focus();
+    if (!raw || !selectedPoem) {
+      alert('请先从上方唐诗宋词库中选择一首诗词！');
       return;
     }
 
@@ -865,8 +641,7 @@
         author: document.getElementById('authorInput').value.trim(),
         edition: currentEdition,
         style: currentStyle,
-        poem_id: (currentMode === 'free' && selectedPoem) ? selectedPoem.id : '',
-        vip_code: (currentMode === 'vip') ? activeVipCode : ''
+        poem_id: selectedPoem.id
       };
       const resp = await fetch(`${apiBase}/api/render`, {
         method: 'POST',
@@ -882,14 +657,9 @@
         alert(msg);
         return;
       }
-      const vipRemHeader = resp.headers.get('X-VIP-Remaining');
       const freeRemHeader = resp.headers.get('X-Quota-Remaining');
-      if (vipRemHeader !== null) {
-        vipRemaining = parseInt(vipRemHeader, 10);
-        document.getElementById('vipStatusBadge').textContent = `已激活 · 剩余 ${vipRemaining} 幅`;
-        document.getElementById('quotaBadge').textContent = `👑 VIP 剩余：${vipRemaining} 幅`;
-      } else if (freeRemHeader !== null) {
-        document.getElementById('quotaBadge').textContent = `免费古诗剩余：${freeRemHeader} / 10 幅`;
+      if (freeRemHeader !== null) {
+        document.getElementById('quotaBadge').textContent = `本小时剩余免费：${freeRemHeader} / 10 幅`;
       }
       const blob = await resp.blob();
       const objUrl = URL.createObjectURL(blob);
@@ -908,18 +678,6 @@
   window.addEventListener('DOMContentLoaded', async () => {
     await loadAnthology();
     refreshQuota();
-
-    // Check if URL has ?vip=VIPXXXX magic auto-unlock link!
-    const params = new URLSearchParams(window.location.search);
-    const urlVip = params.get('vip');
-    if (urlVip) {
-      document.getElementById('vipCodeInput').value = urlVip.trim().toUpperCase();
-      switchMode('vip');
-      await verifyVipCode(true);
-    } else if (activeVipCode) {
-      document.getElementById('vipCodeInput').value = activeVipCode;
-      await verifyVipCode(false);
-    }
   });
 </script>
 </body>

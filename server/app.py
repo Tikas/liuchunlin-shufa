@@ -816,45 +816,21 @@ def render_calligraphy_endpoint(req: RenderRequest, request: Request):
     has_title_col = bool(title)
     rows_per_col = detect_optimal_rows_per_col(body, has_title_col=has_title_col, ruling_style=style)
 
-    # Check if request is using a paid VIP passcode or Free Classical Anthology mode
-    vip_code_str = req.vip_code.strip()
+    # Strictly enforce 963-work Classical Tang/Song/Prose Whitelist (`只允许搜索唐诗宋词来体验`)
+    if not is_in_classical_whitelist(body, poem_id=req.poem_id):
+        raise HTTPException(
+            status_code=403,
+            detail="当前仅支持搜索《传世唐诗宋词·古文经典库》名篇体验生成。如需输入自定义文字，请联系邮箱 sdicfund@hotmail.com",
+        )
+    # Enforce 10 generations per IP per hour quota
+    allowed, remaining = check_and_consume_quota(ip, consume=True)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail=f"本小时墨池已歇（每 IP 每小时最多免费生成 {HOURLY_IP_LIMIT} 幅古诗词），如需输入自定义文字请联系邮箱 sdicfund@hotmail.com",
+        )
     is_vip = False
     vip_rem = -1
-
-    if vip_code_str:
-        ok_vip, vip_rem_check, vip_note = verify_and_consume_vip(vip_code_str, consume=False)
-        if not ok_vip:
-            raise HTTPException(
-                status_code=403,
-                detail="您输入的 VIP 创作通行码无效或剩余次数已用尽，请联系微信 2480555 开通或续期！",
-            )
-        # Validate legality + vertical acrostics BEFORE consuming VIP quota
-        legal_ok, legal_msg = check_text_legality(
-            title=title,
-            author=author,
-            colophon=req.colophon,
-            body=body,
-            rows_per_col=rows_per_col,
-        )
-        if not legal_ok:
-            raise HTTPException(status_code=400, detail=legal_msg)
-        _, vip_rem, _ = verify_and_consume_vip(vip_code_str, consume=True)
-        is_vip = True
-        remaining = 10
-    else:
-        # Free Mode: MUST belong to the 963-work Classical Tang/Song/Prose Whitelist!
-        if not is_in_classical_whitelist(body, poem_id=req.poem_id):
-            raise HTTPException(
-                status_code=403,
-                detail="免费模式仅支持生成《传世唐诗宋词·古文经典库》内的名篇（可在上方搜索框免费搜任意唐诗宋词）。如需题写自定义文字或专属落款，请加微信 2480555 获取 VIP 通行码！",
-            )
-        # Enforce 10 generations per IP per hour quota for Free Mode
-        allowed, remaining = check_and_consume_quota(ip, consume=True)
-        if not allowed:
-            raise HTTPException(
-                status_code=429,
-                detail=f"本小时免费墨池已歇（每 IP 每小时免费生成 {HOURLY_IP_LIMIT} 幅古诗词），如需无限畅享或自定义文字请联系微信 2480555！",
-            )
 
     ttf_path = TRAD_TTF_PATH if edition == "trad" else SIMP_TTF_PATH
     vmap = _VARIANTS_PAYLOAD[edition]
